@@ -35,7 +35,12 @@ export default function Home() {
           setHistory([
             "Welcome to the Interactive Cloud Shell Portfolio.",
             "Copyright (c) 2026 Agustin Lancuba.",
-            "Type 'help' to see available commands or just standard Linux commands.",
+            "",
+            "🚨 CTF CHALLENGE ACTIVE 🚨",
+            "There is a secret 'flag.txt' hidden somewhere in the /var/lib directory.",
+            "Find it, read it, and decode the Base64 content to get my contact info.",
+            "",
+            "Type 'help' for available commands.",
             "------------------------------------------------------------------",
             ""
           ]);

@@ -23,9 +23,15 @@ class SessionManager {
         const sessionId = uuidv4();
         const containerName = `session_${sessionId}`;
 
-        // Security: Network none, memory limit, CPU limit
-        // We mount /tmp to allow some scratch space if needed, or just rely on the container's overlay fs
-        const startCommand = `docker run -d --rm --name ${containerName} --network none --memory 128m --cpus 0.5 python:3.10-alpine sleep infinity`;
+        // CTF Challenge: Injecting a hidden flag
+        // The flag contains: "🎉 FLAG FOUND: agustin.lancuba@gmail.com" encoded in Base64
+        const flagContent = '8J+OiSBGTEFHIEZPVU5EOiBhZ3VzdGluLmxhbmN1YmFAZ21haWwuY29t';
+        
+        // Command explanation:
+        // 1. mkdir -p /var/lib/secret (Deep directory)
+        // 2. echo "..." > flag.txt (Write file)
+        // 3. sleep infinity (Keep container alive)
+        const startCommand = `docker run -d --rm --name ${containerName} --network none --memory 128m --cpus 0.5 python:3.10-alpine sh -c "mkdir -p /var/lib/secret && echo '${flagContent}' > /var/lib/secret/flag.txt && sleep infinity"`;
 
         console.log(`[${sessionId}] Starting container...`);
 
