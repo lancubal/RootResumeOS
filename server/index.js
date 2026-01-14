@@ -124,7 +124,11 @@ app.get('/stream', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
-    console.log('Stateful Architecture: Ready.');
-});
+if (require.main === module) {
+    app.listen(port, () => {
+        console.log(`Server listening at http://localhost:${port}`);
+        console.log('Stateful Architecture: Ready.');
+    });
+}
+
+module.exports = app;

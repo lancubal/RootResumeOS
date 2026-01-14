@@ -13,7 +13,8 @@ class SessionManager {
         this.GC_INTERVAL_MS = 60 * 1000;           // 1 Minute check
 
         // Start the Janitor
-        setInterval(() => this.runGarbageCollector(), this.GC_INTERVAL_MS);
+        this.gcInterval = setInterval(() => this.runGarbageCollector(), this.GC_INTERVAL_MS);
+        this.gcInterval.unref(); // Allows the process to exit even if the interval is active
         console.log(`[SessionManager] GC started. Limits: ${this.MAX_CONCURRENT_SESSIONS} containers, 1h max life.`);
     }
 
