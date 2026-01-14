@@ -12,6 +12,9 @@ export default function Home() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [username, setUsername] = useState('guest');
   
+  // Environment Configuration
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
   // Editor State
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editorFilename, setEditorFilename] = useState('');
@@ -73,7 +76,7 @@ export default function Home() {
   useEffect(() => {
     const initSession = async () => {
       try {
-        const res = await fetch('http://localhost:3001/start', { method: 'POST' });
+        const res = await fetch(`${API_URL}/start`, { method: 'POST' });
         const data = await res.json();
         
         if (data.sessionId) {
@@ -120,7 +123,7 @@ export default function Home() {
         setIsLoading(true);
         setHistory(prev => [...prev, `> Saving ${editorFilename}...`]);
 
-        await fetch('http://localhost:3001/exec', {
+        await fetch(`${API_URL}/exec`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ sessionId, code: cmd }),
@@ -261,7 +264,7 @@ export default function Home() {
 
     if (command === 'challenge') {
         try {
-            const res = await fetch('http://localhost:3001/challenges');
+            const res = await fetch(`${API_URL}/challenges`);
             const list = await res.json();
             const output = list.map((c: any) => `${c.id}. ${c.name} - ${c.description}`).join('\n');
             setHistory(prev => [...prev, "\nAvailable Challenges:", output, "Type 'start <id>' to begin.\n"]);
@@ -276,7 +279,7 @@ export default function Home() {
     if (command.startsWith('start ')) {
         const id = command.split(' ')[1];
         try {
-            const res = await fetch('http://localhost:3001/challenge/load', {
+            const res = await fetch(`${API_URL}/challenge/load`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sessionId, challengeId: id })
@@ -301,7 +304,7 @@ export default function Home() {
 
         // Read file content first
         try {
-            const res = await fetch('http://localhost:3001/exec', {
+            const res = await fetch(`${API_URL}/exec`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sessionId, code: `cat ${filename}` })
@@ -332,7 +335,7 @@ export default function Home() {
 
     if (command === 'verify') {
         try {
-            const res = await fetch('http://localhost:3001/challenge/verify', {
+            const res = await fetch(`${API_URL}/challenge/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sessionId })
@@ -359,7 +362,7 @@ export default function Home() {
     
     // --- STANDARD EXECUTION ---
     try {
-      const response = await fetch('http://localhost:3001/exec', {
+      const response = await fetch(`${API_URL}/exec`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
