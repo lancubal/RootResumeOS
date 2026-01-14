@@ -40,7 +40,11 @@ export default function Home() {
             "There is a secret 'flag.txt' hidden somewhere in the /var/lib directory.",
             "Find it, read it, and decode the Base64 content to get my contact info.",
             "",
-            "Type 'help' for available commands.",
+            "Available Commands:",
+            "  about      - View portfolio architecture",
+            "  help       - Show this help message",
+            "  clear      - Clear terminal history",
+            "  [linux]    - Run any standard Linux command (ls, cat, python...)",
             "------------------------------------------------------------------",
             ""
           ]);
@@ -66,12 +70,64 @@ export default function Home() {
         return;
     }
 
-    const command = input;
+    const command = input.trim();
     setInput(''); // Clear input immediately
     setIsLoading(true);
 
     // Optimistically add command to history
     setHistory(prev => [...prev, `guest@portfolio:~$ ${command}`]);
+
+    // --- Client-Side Commands ---
+    if (command === 'about') {
+        const aboutText = [
+            "",
+            "🏛️  PORTFOLIO ARCHITECTURE",
+            "---------------------------",
+            "1. Frontend: Next.js 14 + Tailwind CSS",
+            "   - Renders this terminal interface.",
+            "",
+            "2. Backend: Node.js + Express",
+            "   - Manages session lifecycle and security.",
+            "",
+            "3. Execution Engine: Docker (Alpine Linux)",
+            "   - You are running inside a real, isolated container.",
+            "   - Filesystem changes persist for your session.",
+            "",
+            "4. Security & Cleanup:",
+            "   - Containers are strictly resource-limited.",
+            "   - Automatic Garbage Collector kills sessions after 10m inactivity.",
+            ""
+        ].join('\n');
+        
+        setHistory(prev => [...prev, aboutText]);
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
+
+    if (command === 'help') {
+        const helpText = [
+            "",
+            "Available Commands:",
+            "  about      - View portfolio architecture",
+            "  help       - Show this help message",
+            "  clear      - Clear terminal history",
+            "  [linux]    - Execute standard commands (ls, mkdir, python, etc.)",
+            ""
+        ].join('\n');
+
+        setHistory(prev => [...prev, helpText]);
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
+
+    if (command === 'clear') {
+        setHistory([]);
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
     
     try {
       const response = await fetch('http://localhost:3001/exec', {
