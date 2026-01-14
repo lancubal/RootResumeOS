@@ -12,6 +12,10 @@ export default function Home() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [username, setUsername] = useState('guest');
   
+  // Command History Navigation
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
   // Environment Configuration
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
@@ -142,6 +146,28 @@ export default function Home() {
     setTimeout(() => inputRef.current?.focus(), 10);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (commandHistory.length > 0) {
+            const newIndex = Math.min(historyIndex + 1, commandHistory.length - 1);
+            setHistoryIndex(newIndex);
+            setInput(commandHistory[commandHistory.length - 1 - newIndex]);
+        }
+    } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex > 0) {
+            const newIndex = historyIndex - 1;
+            setHistoryIndex(newIndex);
+            setInput(commandHistory[commandHistory.length - 1 - newIndex]);
+        } else {
+            setHistoryIndex(-1);
+            setInput('');
+        }
+    } else if (e.key === 'Enter') {
+        handleSubmit();
+    }
+  };
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -153,6 +179,13 @@ export default function Home() {
     }
 
     const command = input.trim();
+    
+    // Save to command history (avoid duplicates if same as last)
+    if (commandHistory.length === 0 || commandHistory[commandHistory.length - 1] !== command) {
+        setCommandHistory(prev => [...prev, command]);
+    }
+    setHistoryIndex(-1); // Reset index on new command
+    
     setInput(''); // Clear input immediately
     setIsLoading(true);
 
@@ -447,6 +480,7 @@ export default function Home() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
                 disabled={isLoading}
                 autoFocus
                 className="w-full flex-1 border-none bg-transparent p-0 text-zinc-100 outline-none focus:ring-0 placeholder-zinc-600"
