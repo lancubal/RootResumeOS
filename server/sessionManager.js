@@ -111,6 +111,25 @@ class SessionManager {
     }
 
     /**
+     * Spawns a command and returns the process for streaming.
+     */
+    spawnCommand(sessionId, code) {
+        const session = this.sessions.get(sessionId);
+        if (!session) throw new Error('Session expired or invalid.');
+
+        session.lastActivity = Date.now();
+
+        // Construct the sh -c command string prepending CWD
+        const shellCommand = `cd ${session.cwd} && ${code}`;
+        
+        console.log(`[${sessionId}] Spawning stream in ${session.cwd}: ${code}`);
+
+        // Use spawn to allow real-time piping of stdout
+        const child = spawn('docker', ['exec', session.name, 'sh', '-c', shellCommand]);
+        return child;
+    }
+
+    /**
      * The Janitor: Enforces both Inactivity and Absolute Lifetime limits.
      */
     runGarbageCollector() {
