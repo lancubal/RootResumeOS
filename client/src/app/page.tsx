@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import confetti from 'canvas-confetti';
+import CodeEditor from './CodeEditor';
 
 export default function Home() {
   const [input, setInput] = useState('');
@@ -10,11 +12,16 @@ export default function Home() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [username, setUsername] = useState('guest');
   
+  // Editor State
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [editorFilename, setEditorFilename] = useState('');
+  const [editorContent, setEditorContent] = useState('');
+
   // --- PORTFOLIO DATA PLACEHOLDERS ---
   const PROJECTS = [
     {
       id: "1",
-      name: "rce-portfolio",
+      name: "RootResume",
       description: "Remote Code Execution Portfolio (The website you are on!)",
       stack: ["Next.js", "Node.js", "Docker", "AWS"],
       status: "In Development",
@@ -72,7 +79,7 @@ export default function Home() {
         if (data.sessionId) {
           setSessionId(data.sessionId);
           setHistory([
-            "Welcome to the Interactive Cloud Shell Portfolio.",
+            "Welcome to the Interactive Cloud Shell Portfolio (RootResume).",
             "Copyright (c) 2026 Agustin Lancuba.",
             "",
             "🚨 CTF CHALLENGE ACTIVE 🚨",
@@ -96,6 +103,49 @@ export default function Home() {
     initSession();
   }, []);
 
+  // --- EDITOR HANDLERS ---
+  const handleEditorSave = async (content: string) => {
+    setIsEditorOpen(false);
+    
+    if (!sessionId) return;
+    
+    // Save file back to container
+    // We use a simple echo. For complex code with special chars, we might need Base64 encoding transfer in future.
+    // For this simple calculator challenge, basic stringify is okay but we must be careful with newlines.
+    
+    // Better approach: wrap in EOF heredoc logic managed by the backend or client
+    // Here we will use the exec endpoint directly, but we need to escape quotes.
+    
+    // Simpler: Use a client-side trick to write line by line or use a more robust backend 'upload' endpoint?
+    // Let's rely on the sessionManager's ability to handle the command.
+    // We'll escape double quotes.
+    const safeContent = content.replace(/"/g, '\\"');
+    const cmd = `printf "${safeContent}" > ${editorFilename}`;
+    
+    setIsLoading(true);
+    setHistory(prev => [...prev, `> Saving ${editorFilename}...`]);
+
+    try {
+        await fetch('http://localhost:3001/exec', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId, code: cmd }),
+        });
+        setHistory(prev => [...prev, `> Saved.`]);
+    } catch (err) {
+        setHistory(prev => [...prev, `> Error saving file.`]);
+    } finally {
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+    }
+  };
+
+  const handleEditorClose = () => {
+    setIsEditorOpen(false);
+    setTimeout(() => inputRef.current?.focus(), 10);
+  };
+
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     
@@ -116,7 +166,7 @@ export default function Home() {
     if (command === 'about') {
         const aboutText = [
             "",
-            "🏛️  PORTFOLIO ARCHITECTURE",
+            "🏛️  PORTFOLIO ARCHITECTURE (RootResume)",
             "---------------------------",
             "1. Frontend: Next.js 14 + Tailwind CSS",
             "   - Renders this terminal interface.",
@@ -149,6 +199,12 @@ export default function Home() {
             "  cat about-me.md- Read my biography",
             "  whoami         - Display current user",
             "  login <name>   - Set your username",
+            "",
+            "  -- Challenge Mode (Unit Testing) --",
+            "  challenge      - List available coding challenges",
+            "  start <id>     - Start a specific challenge (e.g., 'start 1')",
+            "  edit <file>    - Open GUI Editor for a file (e.g., 'edit calculator.py')",
+            "  verify         - Run tests to check your solution",
             "",
             "  -- System --",
             "  about          - View system architecture",
@@ -206,7 +262,101 @@ export default function Home() {
         setTimeout(() => inputRef.current?.focus(), 10);
         return;
     }
+
+    // --- CHALLENGE LOGIC ---
+
+    if (command === 'challenge') {
+        try {
+            const res = await fetch('http://localhost:3001/challenges');
+            const list = await res.json();
+            const output = list.map((c: any) => `${c.id}. ${c.name} - ${c.description}`).join('\n');
+            setHistory(prev => [...prev, "\nAvailable Challenges:", output, "Type 'start <id>' to begin.\n"]);
+        } catch (e) {
+            setHistory(prev => [...prev, "Error fetching challenges."]);
+        }
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
+
+    if (command.startsWith('start ')) {
+        const id = command.split(' ')[1];
+        try {
+            const res = await fetch('http://localhost:3001/challenge/load', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId, challengeId: id })
+            });
+            const data = await res.json();
+            setHistory(prev => [...prev, `\n${data.message}`, "Files: " + data.files.join(', '), "Tip: Type 'edit calculator.py' to fix the bug.\n"]);
+        } catch (e) {
+            setHistory(prev => [...prev, "Error starting challenge."]);
+        }
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
+
+    if (command.startsWith('edit ')) {
+        const filename = command.split(' ')[1];
+        if (!filename) {
+            setHistory(prev => [...prev, "Usage: edit <filename>"]);
+            setIsLoading(false);
+            return;
+        }
+
+        // Read file content first
+        try {
+            const res = await fetch('http://localhost:3001/exec', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId, code: `cat ${filename}` })
+            });
+            const data = await res.json();
+            
+            if (data.error && !data.output) {
+                setHistory(prev => [...prev, `Error: Could not read file '${filename}'. Does it exist?`]);
+            } else {
+                setEditorFilename(filename);
+                setEditorContent(data.output);
+                setIsEditorOpen(true);
+            }
+        } catch (e) {
+            setHistory(prev => [...prev, "Network error reading file."]);
+        }
+        
+        setIsLoading(false);
+        return;
+    }
+
+    if (command === 'verify') {
+        try {
+            const res = await fetch('http://localhost:3001/challenge/verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId })
+            });
+            const data = await res.json();
+            
+            if (data.passed) {
+                setHistory(prev => [...prev, "\n✅ TESTS PASSED! Great job!", "CV Download Unlocked (Simulation)\n"]);
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } else {
+                setHistory(prev => [...prev, "\n❌ TESTS FAILED:", data.output, "\nTry again! Use 'edit calculator.py' to fix the logic.\n"]);
+            }
+        } catch (e) {
+            setHistory(prev => [...prev, "Error running verification."]);
+        }
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
     
+    // --- STANDARD EXECUTION ---
     try {
       const response = await fetch('http://localhost:3001/exec', {
         method: 'POST',
@@ -245,6 +395,15 @@ export default function Home() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-zinc-950 p-4 font-mono text-sm md:p-10">
       
+      {/* Code Editor Modal */}
+      <CodeEditor 
+        isOpen={isEditorOpen}
+        filename={editorFilename}
+        initialContent={editorContent}
+        onSave={handleEditorSave}
+        onClose={handleEditorClose}
+      />
+
       {/* Terminal Window */}
       <div 
         className="relative flex h-[80vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-zinc-800 bg-black shadow-2xl"

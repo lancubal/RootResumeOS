@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const sessionManager = require('./sessionManager');
+const challengeManager = require('./challengeManager');
 
 const app = express();
 const port = 3001;
@@ -36,6 +37,32 @@ app.post('/exec', async (req, res) => {
             return res.status(404).json({ error: 'Session expired. Please refresh to start a new session.' });
         }
         res.status(500).json({ error: 'Execution failed', details: error.message });
+    }
+});
+
+// --- CHALLENGE ENDPOINTS ---
+
+app.get('/challenges', (req, res) => {
+    res.json(challengeManager.getChallengeList());
+});
+
+app.post('/challenge/load', async (req, res) => {
+    const { sessionId, challengeId } = req.body;
+    try {
+        const challenge = await challengeManager.loadChallenge(sessionId, challengeId);
+        res.json({ message: `Challenge '${challenge.name}' loaded. Files created.`, files: Object.keys(challenge.files) });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/challenge/verify', async (req, res) => {
+    const { sessionId } = req.body;
+    try {
+        const result = await challengeManager.verifyChallenge(sessionId);
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 
