@@ -24,8 +24,8 @@ class SessionManager {
         const containerName = `session_${sessionId}`;
 
         // CTF Challenge: Injecting a hidden flag
-        // The flag contains: "🎉 FLAG FOUND: agustin.lancuba@gmail.com" encoded in Base64
-        const flagContent = '8J+OiSBGTEFHIEZPVU5EOiBhZ3VzdGluLmxhbmN1YmFAZ21haWwuY29t';
+        // The flag contains: "✨ You are a true explorer! Let's build something amazing together. Contact me: agustinlancuba.sistemas@gmail.com" encoded in Base64
+        const flagContent = '4pyoIFlvdSBhcmUgYSB0cnVlIGV4cGxvcmVyISBMZXQncyBidWlsZCBzb21ldGhpbmcgYW1hemluZyB0b2dldGhlci4gQ29udGFjdCBtZTogYWd1c3RpbmxhbmN1YmEuc2lzdGVtYXNAZ21haWwuY29t';
         
         // Command explanation:
         // 1. mkdir -p /var/lib/secret (Deep directory)
