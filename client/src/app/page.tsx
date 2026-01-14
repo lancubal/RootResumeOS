@@ -193,28 +193,42 @@ export default function Home() {
     setHistory(prev => [...prev, `${username}@portfolio:~$ ${command}`]);
 
     // --- Client-Side Commands ---
-    if (command === 'about') {
-        const aboutText = [
+    if (command === 'about' || command === 'screenfetch' || command === 'neofetch') {
+        const logo = [
+            "  RRRRRRRRR   ",
+            "  RR      RR  ",
+            "  RR      RR  ",
+            "  RRRRRRRRR   ",
+            "  RR    RR    ",
+            "  RR     RR   ",
+            "  RR      RR  "
+        ];
+
+        const info = [
+            `USER: ${username}`,
+            "OS: RootResume OS v1.0 (Alpine Based)",
+            "KERNEL: Docker-Container-Kernel-5.x",
+            "UPTIME: 1 minute (or until GC kills me)",
+            "PACKAGES: GCC, Rust, Python, SQLite",
+            "SHELL: Custom React-Bash-Emulator",
+            "CPU: 0.5 Virtual Cores",
+            "MEMORY: 128MB (Limited)",
+            "ARCH: x86_64 / Portfolio-Engine",
             "",
-            "🏛️  PORTFOLIO ARCHITECTURE (RootResume)",
-            "---------------------------",
-            "1. Frontend: Next.js 14 + Tailwind CSS",
-            "   - Renders this terminal interface.",
-            "",
-            "2. Backend: Node.js + Express",
-            "   - Manages session lifecycle and security.",
-            "",
-            "3. Execution Engine: Docker (Alpine Linux)",
-            "   - You are running inside a real, isolated container.",
-            "   - Filesystem changes persist for your session.",
-            "",
-            "4. Security & Cleanup:",
-            "   - Containers are strictly resource-limited.",
-            "   - Automatic Garbage Collector kills sessions after 10m inactivity.",
-            ""
-        ].join('\n');
+            "🏛️  ARCHITECTURE: Next.js + Node.js + Docker",
+            "🎨 THEME: Retro Hacker Green"
+        ];
+
+        // Combine Logo and Info side by side
+        let combinedText = "\n";
+        const maxLines = Math.max(logo.length, info.length);
+        for (let i = 0; i < maxLines; i++) {
+            const logoLine = (logo[i] || "").padEnd(16, ' ');
+            const infoLine = info[i] || "";
+            combinedText += `${logoLine} ${infoLine}\n`;
+        }
         
-        setHistory(prev => [...prev, aboutText]);
+        setHistory(prev => [...prev, combinedText]);
         setIsLoading(false);
         setTimeout(() => inputRef.current?.focus(), 10);
         return;
@@ -242,6 +256,7 @@ export default function Home() {
             "",
             "  -- System --",
             "  about          - View system architecture",
+            "  neofetch       - Display system info (style!)",
             "  help           - Show this help message",
             "  clear          - Clear terminal history",
             "  [linux]        - Execute standard commands (ls, mkdir, python, etc.)",
