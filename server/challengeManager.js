@@ -107,22 +107,80 @@ const CHALLENGES = {
         files: {
             'factorial.py':
 "\n" +
-"def factorial(n):\n"
-"    # BUG: Where is the base case? (if n == 0: return 1)\n"
-"    # This will run forever!\n"
+"def factorial(n):\n" +
+"    # BUG: Where is the base case? (if n == 0: return 1)\n" +
+"    # This will run forever!\n" +
 "    return n * factorial(n - 1)\n",
 
             'test_fact.py':
 "\n" +
-"import unittest\n"
-"from factorial import factorial\n"
-"\n"
-"class TestFactorial(unittest.TestCase):\n"
-"    def test_fact(self):\n"
-"        self.assertEqual(factorial(5), 120)\n"
-"        self.assertEqual(factorial(0), 1)\n"
-"\n"
-"if __name__ == '__main__':\n"
+"import unittest\n" +
+"from factorial import factorial\n" +
+"\n" +
+"class TestFactorial(unittest.TestCase):\n" +
+"    def test_fact(self):\n" +
+"        self.assertEqual(factorial(5), 120)\n" +
+"        self.assertEqual(factorial(0), 1)\n" +
+"\n" +
+"if __name__ == '__main__':\n" +
+"    unittest.main()\n"
+        }
+    },
+    '5': {
+        name: "The Log Janitor (Bash)",
+        description: "Write a script in 'cleaner.sh' that deletes all files with .log extension in the current directory.",
+        testFile: "test_bash.py",
+        files: {
+            'cleaner.sh': "#!/bin/sh\n# Write your code here to delete *.log files\n",
+            'test_bash.py': 
+"\n" +
+"import unittest, os, subprocess\n" +
+"class TestBash(unittest.TestCase):\n" +
+"    def test_cleanup(self):\n" +
+"        # 1. Create dummy files\n" +
+"        open('test1.log', 'w').close()\n" +
+"        open('test2.log', 'w').close()\n" +
+"        open('keep.txt', 'w').close()\n" +
+"        # 2. Run user script\n" +
+"        subprocess.run(['sh', 'cleaner.sh'])\n" +
+"        # 3. Check results\n" +
+"        files = os.listdir('.')\n" +
+"        self.assertNotIn('test1.log', files)\n" +
+"        self.assertNotIn('test2.log', files)\n" +
+"        self.assertIn('keep.txt', files)\n" +
+"if __name__ == '__main__':\n" +
+"    unittest.main()\n"
+        }
+    },
+    '6': {
+        name: "The SQL Gatekeeper",
+        description: "The login logic in 'auth.py' is vulnerable to SQL Injection. Fix it using parameterized queries.",
+        testFile: "test_sqli.py",
+        files: {
+            'auth.py':
+"\n" +
+"import sqlite3\n" +
+"def login(username, password):\n" +
+"    db = sqlite3.connect(':memory:')\n" +
+"    db.execute('CREATE TABLE users (user text, pass text)')\n" +
+"    db.execute("INSERT INTO users VALUES ('admin', 'top-secret-123')")\n" +
+"    # BUG: Vulnerable string formatting!\n" +
+"    query = f\"SELECT * FROM users WHERE user = '{username}' AND pass = '{password}'\"\n" +
+"    cursor = db.execute(query)\n" +
+"    return cursor.fetchone() is not None\n",
+
+            'test_sqli.py':
+"\n" +
+"import unittest\n" +
+"from auth import login\n" +
+"class TestSecurity(unittest.TestCase):\n" +
+"    def test_normal_login(self):\n" +
+"        self.assertTrue(login('admin', 'top-secret-123'))\n" +
+"    def test_sqli_attack(self):\n" +
+"        # This should FAIL if the code is secured\n" +
+"        attack_success = login(\"admin' --\", 'wrong-password')\n" +
+"        self.assertFalse(attack_success, 'SECURITY ALERT: SQL Injection bypassed login!')\n" +
+"if __name__ == '__main__':\n" +
 "    unittest.main()\n"
         }
     }
