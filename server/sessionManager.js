@@ -27,11 +27,11 @@ class SessionManager {
         // The flag contains: "✨ You are a true explorer! Let's build something amazing together. Contact me: agustinlancuba.sistemas@gmail.com" encoded in Base64
         const flagContent = '4pyoIFlvdSBhcmUgYSB0cnVlIGV4cGxvcmVyISBMZXQncyBidWlsZCBzb21ldGhpbmcgYW1hemluZyB0b2dldGhlci4gQ29udGFjdCBtZTogYWd1c3RpbmxhbmN1YmEuc2lzdGVtYXNAZ21haWwuY29t';
         
-        // Command explanation:
-        // 1. mkdir -p /var/lib/secret (Deep directory)
-        // 2. echo "..." > flag.txt (Write file)
-        // 3. sleep infinity (Keep container alive)
-        const startCommand = `docker run -d --rm --name ${containerName} --network none --memory 128m --cpus 0.5 python:3.10-alpine sh -c "mkdir -p /var/lib/secret && echo '${flagContent}' > /var/lib/secret/flag.txt && sleep infinity"`;
+        // Hide flag in a deep system directory disguised as a config file
+        const hiddenPath = '/usr/local/lib/.secret_cache';
+        const hiddenFile = 'config.db'; // Camouflage name
+        
+        const startCommand = `docker run -d --rm --name ${containerName} --network none --memory 128m --cpus 0.5 python:3.10-alpine sh -c "mkdir -p ${hiddenPath} && echo '${flagContent}' > ${hiddenPath}/${hiddenFile} && sleep infinity"`;
 
         console.log(`[${sessionId}] Starting container...`);
 
@@ -46,8 +46,12 @@ class SessionManager {
                 this.sessions.set(sessionId, {
                     containerId: containerId,
                     name: containerName,
+                    cwd: '/home', // Default starting directory
                     lastActivity: Date.now()
                 });
+
+                // Create the home directory since it might not exist in alpine basic
+                exec(`docker exec ${containerName} mkdir -p /home`);
 
                 console.log(`[${sessionId}] Container started: ${containerId.substring(0, 12)}`);
                 resolve(sessionId);
@@ -68,24 +72,41 @@ class SessionManager {
         // Update heartbeat
         session.lastActivity = Date.now();
 
-        // Escape double quotes to prevent breaking the bash command
-        const safeCode = code.replace(/"/g, '\\"');
-        
-        // We use 'sh -c' to allow shell features like pipes or redirects inside the container
-        const execCommand = `docker exec ${session.name} sh -c "${safeCode}"`;
+        // Handle 'cd' commands specifically to persist state
+        // Regex to catch "cd /path", "cd ..", "cd"
+        if (code.trim().startsWith('cd ')) {
+            const targetDir = code.trim().substring(3).trim();
+            // We run "cd <current> && cd <target> && pwd" to verify and get new path
+            const checkCmd = `docker exec ${session.name} sh -c "cd ${session.cwd} && cd ${targetDir} && pwd"`;
+            
+            return new Promise((resolve) => {
+                exec(checkCmd, (error, stdout, stderr) => {
+                    if (error) {
+                        // Directory doesn't exist or permission denied
+                        resolve({ output: '', error: `cd: ${targetDir}: No such file or directory` });
+                    } else {
+                        // Update session CWD
+                        session.cwd = stdout.trim();
+                        resolve({ output: '', error: '' }); // cd usually produces no output on success
+                    }
+                });
+            });
+        }
 
-        console.log(`[${sessionId}] Executing: ${code}`);
+        // Standard execution
+        // We prepend "cd <cwd> &&" to maintain the user's location
+        const safeCode = code.replace(/"/g, '\\"');
+        const execCommand = `docker exec ${session.name} sh -c "cd ${session.cwd} && ${safeCode}"`;
+
+        console.log(`[${sessionId}] Executing in ${session.cwd}: ${code}`);
 
         return new Promise((resolve, reject) => {
-            // Timeout for the execution itself (to prevent infinite loops blocking the node process waiting)
+            // Timeout for the execution itself
             exec(execCommand, { timeout: 5000 }, (error, stdout, stderr) => {
                 if (error) {
-                    // Check if it was a timeout from Node's side
                     if (error.killed) {
                         return resolve({ output: stdout, error: 'Timeout: Execution exceeded 5 seconds.' });
                     }
-                    // Docker exec returns non-zero exit code if the command inside failed
-                    // We treat this as "user error", not "server error"
                     return resolve({ output: stdout, error: stderr || error.message });
                 }
                 resolve({ output: stdout, error: stderr });
