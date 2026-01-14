@@ -174,13 +174,13 @@ export default function Home() {
     // --- Client-Side Commands ---
     if (command === 'about' || command === 'neofetch' || command === 'screenfetch') {
         const logo = [
-            "       ▲       ",
-            "      / \\      ",
-            "     / ▲ \\     ",
-            "    / / \\ \\    ",
-            "   / /   \\ \\   ",
-            "  / /_____\\ \\_ ",
-            " /___________/_\\"
+            "  RRRRRRRRR   ",
+            "  RR      RR  ",
+            "  RR      RR  ",
+            "  RRRRRRRRR   ",
+            "  RR    RR    ",
+            "  RR     RR   ",
+            "  RR      RR  "
         ];
 
         const info = [
