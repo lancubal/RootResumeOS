@@ -8,7 +8,46 @@ export default function Home() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [username, setUsername] = useState('guest');
   
+  // --- PORTFOLIO DATA PLACEHOLDERS ---
+  const PROJECTS = [
+    {
+      id: "1",
+      name: "rce-portfolio",
+      description: "Remote Code Execution Portfolio (The website you are on!)",
+      stack: ["Next.js", "Node.js", "Docker", "AWS"],
+      status: "In Development",
+      github: "https://github.com/lancubal/portfolio"
+    },
+    {
+      id: "2",
+      name: "legacy-migrator",
+      description: "Automated tool to migrate legacy PHP apps to modern stacks.",
+      stack: ["Python", "Bash", "Ansible"],
+      status: "Concept",
+      github: "https://github.com/lancubal/legacy-migrator"
+    }
+  ];
+
+  const ABOUT_ME = [
+    "# About Me",
+    "",
+    "Hi, I'm Agustin Lancuba.",
+    "I am a passionate Software Engineer specializing in Full Stack Development and Cloud Architecture.",
+    "",
+    "## Core Skills",
+    "- Backend: Node.js, Python, Go",
+    "- Frontend: React, Next.js, Tailwind",
+    "- DevOps: Docker, Kubernetes, AWS",
+    "",
+    "## Philosophy",
+    "I believe in building systems that are secure by design and delightful to use.",
+    "This portfolio is a testament to that: a fully functional RCE environment running securely in your browser.",
+    "",
+    "Contact: agustinlancuba.sistemas@gmail.com"
+  ].join('\n');
+
   // Refs for auto-scrolling and focus
   const terminalEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -40,11 +79,7 @@ export default function Home() {
             "There is a secret 'flag.txt' hidden somewhere in the /var/lib directory.",
             "Find it, read it, and decode the Base64 content to get my contact info.",
             "",
-            "Available Commands:",
-            "  about      - View portfolio architecture",
-            "  help       - Show this help message",
-            "  clear      - Clear terminal history",
-            "  [linux]    - Run any standard Linux command (ls, cat, python...)",
+            "Type 'help' for available commands.",
             "------------------------------------------------------------------",
             ""
           ]);
@@ -75,7 +110,7 @@ export default function Home() {
     setIsLoading(true);
 
     // Optimistically add command to history
-    setHistory(prev => [...prev, `guest@portfolio:~$ ${command}`]);
+    setHistory(prev => [...prev, `${username}@portfolio:~$ ${command}`]);
 
     // --- Client-Side Commands ---
     if (command === 'about') {
@@ -109,10 +144,17 @@ export default function Home() {
         const helpText = [
             "",
             "Available Commands:",
-            "  about      - View portfolio architecture",
-            "  help       - Show this help message",
-            "  clear      - Clear terminal history",
-            "  [linux]    - Execute standard commands (ls, mkdir, python, etc.)",
+            "  -- Navigation --",
+            "  ls projects    - List my GitHub projects (JSON)",
+            "  cat about-me.md- Read my biography",
+            "  whoami         - Display current user",
+            "  login <name>   - Set your username",
+            "",
+            "  -- System --",
+            "  about          - View system architecture",
+            "  help           - Show this help message",
+            "  clear          - Clear terminal history",
+            "  [linux]        - Execute standard commands (ls, mkdir, python, etc.)",
             ""
         ].join('\n');
 
@@ -124,6 +166,42 @@ export default function Home() {
 
     if (command === 'clear') {
         setHistory([]);
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
+
+    // --- Portfolio Navigation Commands ---
+    
+    if (command === 'ls projects') {
+        setHistory(prev => [...prev, JSON.stringify(PROJECTS, null, 2)]);
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
+
+    if (command === 'cat about-me.md') {
+        setHistory(prev => [...prev, ABOUT_ME]);
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
+
+    if (command === 'whoami') {
+        setHistory(prev => [...prev, username]);
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
+
+    if (command.startsWith('login ')) {
+        const newName = command.split(' ')[1];
+        if (newName) {
+            setUsername(newName);
+            setHistory(prev => [...prev, `> User changed to: ${newName}`]);
+        } else {
+            setHistory(prev => [...prev, "Usage: login <username>"]);
+        }
         setIsLoading(false);
         setTimeout(() => inputRef.current?.focus(), 10);
         return;
@@ -180,7 +258,7 @@ export default function Home() {
             <div className="h-3 w-3 rounded-full bg-yellow-500/80"></div>
             <div className="h-3 w-3 rounded-full bg-green-500/80"></div>
           </div>
-          <div className="text-zinc-400">guest@portfolio: ~</div>
+          <div className="text-zinc-400">{username}@portfolio: ~</div>
           <div className="w-10"></div> {/* Spacer for centering */}
         </div>
 
@@ -200,7 +278,7 @@ export default function Home() {
           {/* Active Input Line */}
           {!isInitializing && (
             <form onSubmit={handleSubmit} className="flex items-center">
-              <span className="mr-2 text-green-500 shrink-0">guest@portfolio:~$</span>
+              <span className="mr-2 text-green-500 shrink-0">{username}@portfolio:~$</span>
               <input
                 ref={inputRef}
                 type="text"
