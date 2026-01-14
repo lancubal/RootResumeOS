@@ -9,30 +9,30 @@ const CHALLENGES = {
         name: "Broken Calculator",
         description: "The 'add' function is subtracting instead of adding. Fix it to pass the tests!",
         files: {
-            'calculator.py': "
-class Calculator:
-    def add(self, a, b):
-        # BUG: This should be addition!
-        return a - b
+            'calculator.py': 
+"\n" +
+"class Calculator:\n" +
+"    def add(self, a, b):\n" +
+"        # BUG: This should be addition!\n" +
+"        return a - b\n" +
+"\n" +
+"    def subtract(self, a, b):\n" +
+"        return a - b\n",
 
-    def subtract(self, a, b):
-        return a - b
-",
-            'test_calc.py': "
-import unittest
-from calculator import Calculator
-
-class TestCalculator(unittest.TestCase):
-    def setUp(self):
-        self.calc = Calculator()
-
-    def test_add(self):
-        self.assertEqual(self.calc.add(5, 3), 8, "5 + 3 should be 8")
-        self.assertEqual(self.calc.add(-1, 1), 0, "-1 + 1 should be 0")
-
-if __name__ == '__main__':
-    unittest.main()
-"
+            'test_calc.py': 
+"\n" +
+"import unittest\n" +
+"from calculator import Calculator\n" +
+"\n" +
+"class TestCalculator(unittest.TestCase):\n" +
+"    def setUp(self):        self.calc = Calculator()\n" +
+"\n" +
+"    def test_add(self):\n" +
+"        self.assertEqual(self.calc.add(5, 3), 8, '5 + 3 should be 8')\n" +
+"        self.assertEqual(self.calc.add(-1, 1), 0, '-1 + 1 should be 0')\n" +
+"\n" +
+"if __name__ == '__main__':\n" +
+"    unittest.main()\n"
         }
     }
 };
@@ -60,14 +60,13 @@ class ChallengeManager {
 
         console.log(`[${sessionId}] Loading Challenge ${challengeId}...`);
 
-        // Write files to container
+        // Write files to container using Base64 to avoid escaping hell
         for (const [filename, content] of Object.entries(challenge.files)) {
-            // Escape special chars for echo
-            // Ideally we would use 'docker cp', but echo is faster for small text
-            // We use a safe persistent writing method via sessionManager
-            await sessionManager.executeCommand(sessionId, `cat <<EOF > ${filename}
-${content}
-EOF`);
+            const b64 = Buffer.from(content).toString('base64');
+            // Command: echo "BASE64" | base64 -d > filename
+            const cmd = `echo "${b64}" | base64 -d > ${filename}`;
+            
+            await sessionManager.executeCommand(sessionId, cmd);
         }
         
         this.activeChallenges.set(sessionId, challengeId);
@@ -78,24 +77,23 @@ EOF`);
         const challengeId = this.activeChallenges.get(sessionId);
         if (!challengeId) throw new Error("No active challenge.");
 
-        // Hardcoded verification command for Python unittest
-        // In the future this could be dynamic based on challenge config
         const cmd = "python3 -m unittest test_calc.py";
-        
         const result = await sessionManager.executeCommand(sessionId, cmd);
         
-        // Check if unittest passed (usually output contains "OK")
-        // Note: executeCommand returns { output, error }
-        // Standard python unittest writes to stderr for status dots, but exit code matters.
-        // Since our executeCommand captures stdout/stderr, we parse the text.
-        
+        // Output from unittest usually goes to stderr (dots .F.E)
         const combinedOutput = (result.output + "\n" + (result.error || "")).toLowerCase();
         
-        const passed = combinedOutput.includes("ok") && !combinedOutput.includes("failed");
+        // Strict Check:
+        // 1. Must contain "OK"
+        // 2. Must NOT contain "FAILED"
+        // 3. Must NOT contain "ERROR" (Syntax error, etc)
+        const isSuccess = combinedOutput.includes("ok") && 
+                          !combinedOutput.includes("failed") && 
+                          !combinedOutput.includes("error");
         
         return {
-            passed,
-            output: result.output || result.error
+            passed: isSuccess,
+            output: result.error || result.output || "No output from tests."
         };
     }
 }

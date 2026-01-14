@@ -314,8 +314,15 @@ export default function Home() {
             });
             const data = await res.json();
             
-            if (data.error && !data.output) {
+            // Check for errors or empty content
+            if (data.error || (data.output && data.output.startsWith('cat:'))) {
                 setHistory(prev => [...prev, `Error: Could not read file '${filename}'. Does it exist?`]);
+            } else if (!data.output) {
+                // Handle empty file case
+                 setHistory(prev => [...prev, `Warning: '${filename}' is empty.`]);
+                 setEditorFilename(filename);
+                 setEditorContent("");
+                 setIsEditorOpen(true);
             } else {
                 setEditorFilename(filename);
                 setEditorContent(data.output);
