@@ -1,4 +1,5 @@
 const express = require('express');
+const { exec } = require('child_process'); // Import exec
 const cors = require('cors');
 const sessionManager = require('./sessionManager');
 const challengeManager = require('./challengeManager');
@@ -24,13 +25,19 @@ app.post('/start', async (req, res) => {
 
 // Endpoint to execute commands in that session
 app.post('/exec', async (req, res) => {
-    const { sessionId, code } = req.body;
+    const { sessionId, code, background } = req.body;
     
     if (!sessionId || !code) {
         return res.status(400).json({ error: 'Missing sessionId or code' });
     }
 
     try {
+        if (background) {
+            sessionManager.executeInBackground(sessionId, code);
+            // For background commands, we don't wait and respond immediately.
+            return res.status(202).json({ message: 'Process started in background' });
+        }
+
         const result = await sessionManager.executeCommand(sessionId, code);
         res.json(result);
     } catch (error) {
@@ -132,7 +139,7 @@ app.get('/stats', async (req, res) => {
             // docker stats --no-stream --format "{{.CPUPerc}}\t{{.MemUsage}}"
             const statsCommand = `docker stats --no-stream --format "{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}" ${containerName}`;
             const statsResult = await new Promise((resolve) => {
-                sessionManager.exec(statsCommand, (error, stdout, stderr) => {
+                exec(statsCommand, (error, stdout, stderr) => {
                     if (error) resolve({ error: stderr || error.message });
                     else resolve({ output: stdout });
                 });

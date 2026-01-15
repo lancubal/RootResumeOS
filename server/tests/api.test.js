@@ -48,6 +48,19 @@ describe('API Endpoints', () => {
         expect(response.body.error).toContain('expired');
     });
 
+    test('POST /exec should handle background commands', async () => {
+        sessionManager.executeInBackground.mockResolvedValue();
+
+        const response = await request(app)
+            .post('/exec')
+            .send({ sessionId: 'test-id', code: 'sleep 10', background: true });
+
+        expect(response.statusCode).toBe(202);
+        expect(response.body.message).toContain('Process started in background');
+        expect(sessionManager.executeInBackground).toHaveBeenCalledWith('test-id', 'sleep 10');
+        expect(sessionManager.executeCommand).not.toHaveBeenCalled();
+    });
+
     test('GET /challenges should return list', async () => {
         challengeManager.getChallengeList.mockReturnValue([{ id: '1', name: 'Test' }]);
 

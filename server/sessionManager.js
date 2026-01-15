@@ -131,6 +131,26 @@ class SessionManager {
     }
 
     /**
+     * Executes a command in the background (fire-and-forget).
+     */
+    executeInBackground(sessionId, code) {
+        const session = this.sessions.get(sessionId);
+        if (!session) return; // Do nothing if session is invalid
+
+        session.lastActivity = Date.now();
+        const shellCommand = `cd ${session.cwd} && ${code}`;
+        
+        console.log(`[${sessionId}] Spawning background process: ${code}`);
+
+        const child = spawn('docker', ['exec', session.name, 'sh', '-c', shellCommand], {
+            detached: true,
+            stdio: 'ignore'
+        });
+
+        child.unref(); // Allow the parent (our server) to exit independently
+    }
+
+    /**
      * The Janitor: Enforces both Inactivity and Absolute Lifetime limits.
      */
     runGarbageCollector() {

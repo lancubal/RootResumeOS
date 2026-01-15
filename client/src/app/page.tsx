@@ -29,6 +29,9 @@ export default function Home() {
   const [editorFilename, setEditorFilename] = useState('');
   const [editorContent, setEditorContent] = useState('');
 
+  // Ref to hold the active EventSource stream for commands like 'top' or 'visualize'
+  const streamRef = useRef<EventSource | null>(null);
+
   // --- PORTFOLIO DATA ---
   const PROJECTS = [
     {
@@ -60,6 +63,27 @@ export default function Home() {
   // Refs for auto-scrolling and focus
   const terminalEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Global Ctrl+C handler for streams
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
+        if (streamRef.current) {
+          e.preventDefault();
+          streamRef.current.close();
+          streamRef.current = null;
+          setHistory(prev => [...prev, { text: '^C', type: 'cmd' }]);
+          setIsLoading(false);
+          setTimeout(() => inputRef.current?.focus(), 10);
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, [streamRef]); // Dependency array ensures the listener always has the latest ref
 
   const handleTerminalClick = () => {
     inputRef.current?.focus();
@@ -218,6 +242,7 @@ export default function Home() {
             "  cat about-me.md- My bio",
             "  visualize <id> - Run algo demo (bubble, selection, quick, pathfinder, dfs)",
             "  challenge      - Enter coding mode",
+            "  command &      - Run a command in the background",
             "  -- System --",
             "  about          - View system architecture",
             "  neofetch       - Display system info (style!)",
@@ -346,8 +371,12 @@ export default function Home() {
 
     if (command.startsWith('visualize ')) {
         const vizId = command.split(' ')[1];
+        if (streamRef.current) streamRef.current.close(); // Close any existing stream
+        
         pushToHistory(`Starting ${vizId} visualization...`);
         const evtSource = new EventSource(`${API_URL}/stream?sessionId=${sessionId}&vizId=${vizId}`);
+        streamRef.current = evtSource;
+
         setHistory(prev => [...prev, { text: "", type: 'output' }]); 
         evtSource.onmessage = (event) => {
             const text = atob(event.data);
@@ -359,11 +388,13 @@ export default function Home() {
         };
         evtSource.addEventListener('close', () => {
             evtSource.close();
+            streamRef.current = null;
             setIsLoading(false);
             pushToHistory("Finished.");
         });
         evtSource.onerror = () => {
             evtSource.close();
+            streamRef.current = null;
             setIsLoading(false);
             pushToHistory("Stream failed.", 'error');
         };
@@ -372,10 +403,14 @@ export default function Home() {
     
     // --- STREAMING ENDPOINT (SSE for 'top' command) ---
     if (command === 'top') {
-        pushToHistory("Starting 'top' command. Press Ctrl+C (or refresh) to stop.", 'header');
-        setHistory(prev => [...prev, { text: "", type: 'output' }]); // Placeholder for dynamic update
+        if (streamRef.current) streamRef.current.close(); // Close any existing stream
+
+        pushToHistory("Starting 'top' command. Press Ctrl+C to stop.", 'header');
+        pushToHistory("CPU %\tMEM USAGE\tNET I/O\tBLOCK I/O", 'info'); // Headers for top command
+        setHistory(prev => [...prev, { text: "Gathering data...", type: 'output' }]); // Placeholder for dynamic update
 
         const evtSource = new EventSource(`${API_URL}/stats?sessionId=${sessionId}`);
+        streamRef.current = evtSource;
         
         evtSource.onmessage = (event) => {
             const text = atob(event.data); // Decode base64 stats string
@@ -389,6 +424,7 @@ export default function Home() {
 
         evtSource.onerror = () => {
             evtSource.close();
+            streamRef.current = null;
             setIsLoading(false);
             pushToHistory("'top' command stream closed or failed.", 'error');
             setTimeout(() => inputRef.current?.focus(), 10);
@@ -396,6 +432,7 @@ export default function Home() {
 
         evtSource.addEventListener('close', () => { // Custom close event from backend
             evtSource.close();
+            streamRef.current = null;
             setIsLoading(false);
             pushToHistory("Top command finished.", 'output');
             setTimeout(() => inputRef.current?.focus(), 10);
@@ -405,6 +442,26 @@ export default function Home() {
         return; 
     }
     
+    // --- Background Job Handling ---
+    if (command.endsWith(' &')) {
+        const bgCommand = command.slice(0, -2).trim();
+        pushToHistory(`[+] Starting background process: ${bgCommand}`);
+        
+        // Fire-and-forget
+        fetch(`${API_URL}/exec`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionId, code: bgCommand, background: true }),
+        }).catch(err => {
+            // We can't easily show this error in history, but we should log it.
+            console.error("Background command failed to send:", err);
+        });
+
+        setIsLoading(false);
+        setTimeout(() => inputRef.current?.focus(), 10);
+        return;
+    }
+
     // Standard Exec
     try {
       const response = await fetch(`${API_URL}/exec`, {

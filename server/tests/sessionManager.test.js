@@ -122,6 +122,23 @@ describe('SessionManager', () => {
         );
     });
 
+    test('should execute a command in background', () => {
+        sessionManager.sessions.set('test-uuid', { name: 'session_test', cwd: '/home/tmp', lastActivity: Date.now() });
+        const mockChildProcess = { unref: jest.fn() };
+        spawn.mockReturnValue(mockChildProcess);
+
+        sessionManager.executeInBackground('test-uuid', 'sleep 5');
+
+        expect(spawn).toHaveBeenCalledWith(
+            'docker',
+            ['exec', 'session_test', 'sh', '-c', 'cd /home/tmp && sleep 5'],
+            { detached: true, stdio: 'ignore' }
+        );
+        expect(mockChildProcess.unref).toHaveBeenCalled();
+        const session = sessionManager.sessions.get('test-uuid');
+        expect(session.lastActivity).toBeGreaterThan(0); // Should be updated
+    });
+
     afterAll(() => {
         if (sessionManager.gcInterval) {
             clearInterval(sessionManager.gcInterval);

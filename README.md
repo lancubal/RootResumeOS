@@ -29,6 +29,8 @@ This project moves beyond simple "stateless" script execution by implementing a 
 *   **CTF Challenge:** A hidden flag is buried deep in the system. Find it and decode it to get my secret contact info.
 *   **Coding Challenges:** Fixed broken logic in real-time. The system runs unit tests inside the container and celebrates your victory with confetti.
 *   **Algorithm Visualization:** Watch C/Rust algorithms run step-by-step with retro ASCII animations streamed directly from the container.
+*   **Real-time Monitoring:** Use the `top` command to view live container resource usage (CPU, Memory, I/O).
+*   **Background Jobs:** Run processes in the background using the `&` symbol (e.g., `while true; do true; done &`) and continue using the terminal.
 
 ### System Flow
 
@@ -95,6 +97,6 @@ Open [http://localhost:3000](http://localhost:3000) to access your Cloud Shell.
 - [x] Docker Container Orchestration
 - [x] **Stateful Sessions** (Persistence)
 - [x] Automatic Garbage Collection
+- [x] Network Security Hardening (`--network none`)
 - [ ] AWS EC2 Deployment
 - [ ] Nginx Reverse Proxy & SSL
-- [ ] Network Security Hardening (`--network none`)
