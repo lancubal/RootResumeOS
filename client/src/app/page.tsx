@@ -7,6 +7,7 @@ import CodeEditor from './CodeEditor';
 interface HistoryItem {
   text: string;
   type?: 'cmd' | 'output' | 'error' | 'header' | 'logo' | 'info';
+  cwd?: string;
 }
 
 export default function Home() {
@@ -223,7 +224,7 @@ export default function Home() {
                         const newInput = input.substring(0, lastPartIndex) + ` ${completed}`;
                         setInput(newInput + (completed.endsWith('/') ? '' : ' '));
                     } else {
-                        setHistory(prev => [...prev, { text: `${username}@RootResume:~$ ${input}`, type: 'cmd' }]);
+                        setHistory(prev => [...prev, { text: input, type: 'cmd', cwd: cwd }]);
                         setHistory(prev => [...prev, { text: data.completions.join('\t'), type: 'output' }]);
                     }
                 }
@@ -234,7 +235,7 @@ export default function Home() {
             if (matches.length === 1) {
                 setInput(matches[0] + ' ');
             } else if (matches.length > 1) {
-                setHistory(prev => [...prev, { text: `${username}@RootResume:~$ ${input}`, type: 'cmd' }]);
+                setHistory(prev => [...prev, { text: input, type: 'cmd', cwd: cwd }]);
                 setHistory(prev => [...prev, { text: matches.join('\t'), type: 'output' }]);
             }
         }
@@ -257,7 +258,7 @@ export default function Home() {
     setInput('');
     setIsLoading(true);
 
-    setHistory(prev => [...prev, { text: `${username}@RootResume:~$ ${command}`, type: 'cmd' }]);
+    setHistory(prev => [...prev, { text: command, type: 'cmd', cwd: cwd }]);
     
     // --- START COMMAND HANDLING ---
 
@@ -487,14 +488,23 @@ export default function Home() {
         <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
           {isInitializing && <div className="animate-pulse text-green-500">Booting RootResume OS...</div>}
           {history.map((item, i) => (
-            <div key={i} className={`whitespace-pre-wrap break-words leading-relaxed mb-1 ${ 
-                item.type === 'cmd' ? 'text-green-400 font-bold' : 
-                item.type === 'error' ? 'text-red-400' : 
-                item.type === 'header' ? 'text-blue-400 font-bold' : 
-                item.type === 'logo' ? 'text-emerald-500' : 
-                'text-zinc-300'
-            }`}>
-              {item.type === 'cmd' ? item.text.replace('~', cwd) : item.text}
+            <div key={i} className="whitespace-pre-wrap break-words leading-relaxed mb-1">
+              {item.type === 'cmd' ? (
+                <div className="text-green-400 font-bold">
+                  <span className="shrink-0">{username}@RootResume:{item.cwd || '~'}$ </span>
+                  <span>{item.text}</span>
+                </div>
+              ) : (
+                <div className={
+                    item.type === 'error' ? 'text-red-400' : 
+                    item.type === 'header' ? 'text-blue-400 font-bold' : 
+                    item.type === 'info' ? 'text-yellow-400' :
+                    item.type === 'logo' ? 'text-emerald-500' : 
+                    'text-zinc-300'
+                }>
+                    {item.text}
+                </div>
+              )}
             </div>
           ))}
           {!isInitializing && (
