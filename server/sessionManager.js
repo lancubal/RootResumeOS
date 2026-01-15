@@ -94,8 +94,9 @@ class SessionManager {
                     if (error) {
                         resolve({ output: '', error: `cd: ${targetDir}: No such file or directory` });
                     } else {
-                        session.cwd = stdout.trim();
-                        resolve({ output: '', error: '' });
+                        const newCwd = stdout.trim();
+                        session.cwd = newCwd;
+                        resolve({ output: '', error: '', cwd: newCwd });
                     }
                 });
             });

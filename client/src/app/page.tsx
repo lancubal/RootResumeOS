@@ -16,6 +16,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [username, setUsername] = useState('guest');
+  const [cwd, setCwd] = useState('~');
   
   // Command History Navigation
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
@@ -42,8 +43,6 @@ export default function Home() {
     'edit',
     'verify',
     'about',
-    'neofetch',
-    'screenfetch',
     'top',
     'help',
     'clear',
@@ -263,7 +262,7 @@ export default function Home() {
     // --- START COMMAND HANDLING ---
 
     // --- Client-Side Commands ---
-    if (command === 'about' || command === 'neofetch' || command === 'screenfetch') {
+    if (command === 'about') {
         const logo = [
             "  RRRRRRRRR   ", "  RR      RR  ", "  RR      RR  ",
             "  RRRRRRRRR   ", "  RR    RR    ", "  RR     RR   ", "  RR      RR  "
@@ -335,6 +334,7 @@ export default function Home() {
 
     } else if (command.startsWith('start ')) {
         const id = command.split(' ')[1];
+        pushToHistory('[Narrator] Creating challenge files in the container\'s virtual filesystem...', 'info');
         try {
             const res = await fetch(`${API_URL}/challenge/load`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -373,6 +373,7 @@ export default function Home() {
         }
     
     } else if (command === 'verify') {
+        pushToHistory('[Narrator] Running test suite against your code inside the container...', 'info');
         try {
             const res = await fetch(`${API_URL}/challenge/verify`, {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -397,6 +398,11 @@ export default function Home() {
         if (command.startsWith('visualize ')) {
             const vizId = command.split(' ')[1];
             if (streamRef.current) streamRef.current.close();
+
+            // --- Narrative UX ---
+            pushToHistory(`[Narrator] Compiling ${vizId}.c with GCC inside the secure container...`, 'info');
+            pushToHistory(`[Narrator] Executing binary and streaming STDOUT via Server-Sent Events...`, 'info');
+            
             pushToHistory(`Starting ${vizId} visualization...`);
             const evtSource = new EventSource(`${API_URL}/stream?sessionId=${sessionId}&vizId=${vizId}`);
             streamRef.current = evtSource;
@@ -452,6 +458,9 @@ export default function Home() {
                 });
                 const data = await response.json();
                 pushToHistory(data.error || data.output || "");
+                if (data.cwd) {
+                    setCwd(data.cwd.replace('/home/guest', '~'));
+                }
             } catch (error) {
                 pushToHistory("Network Error", 'error');
             } finally {
@@ -472,7 +481,7 @@ export default function Home() {
       <div className="relative flex h-[80vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-zinc-800 bg-black shadow-2xl" onClick={handleTerminalClick}>
         <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 py-2">
           <div className="flex gap-2"><div className="h-3 w-3 rounded-full bg-red-500/80"></div><div className="h-3 w-3 rounded-full bg-yellow-500/80"></div><div className="h-3 w-3 rounded-full bg-green-500/80"></div></div>
-          <div className="text-zinc-400">{username}@RootResume: ~</div>
+          <div className="text-zinc-400">{username}@RootResume: {cwd}</div>
           <div className="w-10"></div>
         </div>
         <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
@@ -485,12 +494,12 @@ export default function Home() {
                 item.type === 'logo' ? 'text-emerald-500' : 
                 'text-zinc-300'
             }`}>
-              {item.text}
+              {item.type === 'cmd' ? item.text.replace('~', cwd) : item.text}
             </div>
           ))}
           {!isInitializing && (
             <form onSubmit={handleSubmit} className="flex items-center">
-              <span className="mr-2 text-green-500 shrink-0">{username}@RootResume:~$</span>
+              <span className="mr-2 text-green-500 shrink-0">{username}@RootResume:{cwd}$</span>
               <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isLoading} autoFocus className="w-full flex-1 border-none bg-transparent p-0 text-zinc-100 outline-none focus:ring-0 placeholder-zinc-600" autoComplete="off" spellCheck="false" />
             </form>
           )}

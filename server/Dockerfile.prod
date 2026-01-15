@@ -1,0 +1,26 @@
+# Stage 1: Build dependencies
+FROM node:20-alpine AS deps
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+
+# Stage 2: Production image
+FROM node:20-alpine
+
+# Install Docker CLI
+RUN apk add --no-cache docker-cli
+
+WORKDIR /usr/src/app
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+COPY . .
+
+# Expose the port the app runs on
+EXPOSE 3001
+
+# The portfolio-runner Docker image must be built and available on the host machine
+# This backend requires access to the Docker socket to spawn sibling containers.
+# IMPORTANT: Mounting the Docker socket has security implications.
+# Only do this in a trusted environment.
+VOLUME /var/run/docker.sock
+
+CMD [ "node", "index.js" ]

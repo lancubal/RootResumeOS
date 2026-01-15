@@ -1,5 +1,5 @@
 const express = require('express');
-const { exec } = require('child_process'); // Import exec
+const { exec } = require('child_process');
 const cors = require('cors');
 const sessionManager = require('./sessionManager');
 const challengeManager = require('./challengeManager');
@@ -8,12 +8,12 @@ const visualizationManager = require('./visualizationManager');
 const app = express();
 const port = 3001;
 
-app.use(cors({
-    origin: 'http://localhost:3000'
-}));
+// A more permissive CORS for the Docker environment.
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Endpoint to initialize a persistent session
+// --- CORE ENDPOINTS ---
+
 app.post('/start', async (req, res) => {
     try {
         const sessionId = await sessionManager.startSession();
@@ -23,21 +23,16 @@ app.post('/start', async (req, res) => {
     }
 });
 
-// Endpoint to execute commands in that session
 app.post('/exec', async (req, res) => {
     const { sessionId, code, background } = req.body;
-    
     if (!sessionId || !code) {
         return res.status(400).json({ error: 'Missing sessionId or code' });
     }
-
     try {
         if (background) {
             sessionManager.executeInBackground(sessionId, code);
-            // For background commands, we don't wait and respond immediately.
             return res.status(202).json({ message: 'Process started in background' });
         }
-
         const result = await sessionManager.executeCommand(sessionId, code);
         res.json(result);
     } catch (error) {
@@ -53,7 +48,6 @@ app.post('/autocomplete', async (req, res) => {
     if (!sessionId || partial === undefined) {
         return res.status(400).json({ error: 'Missing sessionId or partial' });
     }
-
     try {
         const completions = await sessionManager.getCompletions(sessionId, partial);
         res.json({ completions });
@@ -88,69 +82,45 @@ app.post('/challenge/verify', async (req, res) => {
     }
 });
 
-// --- STREAMING ENDPOINT (SSE) ---
+// --- STREAMING ENDPOINTS ---
+
 app.get('/stream', async (req, res) => {
     const { sessionId, vizId } = req.query;
-
     if (!sessionId || !vizId) {
         return res.status(400).send('Missing sessionId or vizId');
     }
-
     try {
         const executable = await visualizationManager.prepareVisualization(sessionId, vizId);
-        
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
-        
         const child = sessionManager.spawnCommand(sessionId, executable);
-
-        child.stdout.on('data', (chunk) => {
-            const b64 = chunk.toString('base64');
-            res.write(`data: ${b64}\n\n`);
-        });
-
-        child.stderr.on('data', (chunk) => {
-            const b64 = chunk.toString('base64');
-            res.write(`data: ${b64}\n\n`);
-        });
-
-        child.on('close', (code) => {
+        child.stdout.on('data', (chunk) => res.write(`data: ${chunk.toString('base64')}\n\n`));
+        child.stderr.on('data', (chunk) => res.write(`data: ${chunk.toString('base64')}\n\n`));
+        child.on('close', () => {
             res.write('event: close\ndata: closed\n\n');
             res.end();
         });
-
-        req.on('close', () => {
-            child.kill(); 
-        });
-
+        req.on('close', () => child.kill());
     } catch (error) {
         console.error('Stream error:', error);
-        if (!res.headersSent) {
-            res.status(500).json({ error: error.message });
-        } else {
-            res.end();
-        }
+        if (!res.headersSent) res.status(500).json({ error: error.message });
+        else res.end();
     }
 });
 
-// --- STATS STREAMING ENDPOINT (SSE for 'top' command) ---
 app.get('/stats', async (req, res) => {
     const { sessionId } = req.query;
     if (!sessionId) {
         return res.status(400).send('Missing sessionId');
     }
-
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
-
     let intervalId;
     try {
         const containerName = sessionManager.sessions.get(sessionId).name;
-        
         intervalId = setInterval(async () => {
-            // docker stats --no-stream --format "{{.CPUPerc}}\t{{.MemUsage}}"
             const statsCommand = `docker stats --no-stream --format "{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}" ${containerName}`;
             const statsResult = await new Promise((resolve) => {
                 exec(statsCommand, (error, stdout, stderr) => {
@@ -158,35 +128,25 @@ app.get('/stats', async (req, res) => {
                     else resolve({ output: stdout });
                 });
             });
-
             if (statsResult.error) {
                 res.write(`data: ${Buffer.from(statsResult.error).toString('base64')}\n\n`);
                 clearInterval(intervalId);
                 return;
             }
-
             res.write(`data: ${Buffer.from(statsResult.output).toString('base64')}\n\n`);
-        }, 1000); // Update every 1 second
-
-        req.on('close', () => {
-            clearInterval(intervalId);
-            res.end();
-        });
-
+        }, 1000);
+        req.on('close', () => clearInterval(intervalId));
     } catch (error) {
         console.error('Stats Stream error:', error);
         if (intervalId) clearInterval(intervalId);
-        if (!res.headersSent) {
-            res.status(500).json({ error: error.message });
-        } else {
-            res.end();
-        }
+        if (!res.headersSent) res.status(500).json({ error: error.message });
+        else res.end();
     }
 });
 
 if (require.main === module) {
-    app.listen(port, () => {
-        console.log(`Server listening at http://localhost:${port}`);
+    app.listen(port, '0.0.0.0', () => {
+        console.log(`Server listening at http://0.0.0.0:${port}`);
         console.log('Stateful Architecture: Ready.');
     });
 }

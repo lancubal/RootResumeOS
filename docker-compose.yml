@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  # The Nginx reverse proxy is the single entry point for all traffic.
+  proxy:
+    image: nginx:1.25-alpine
+    volumes:
+      # Mount our custom Nginx configuration
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      # Expose port 80 to the host machine
+      - "80:80"
+    networks:
+      - portfolio-net
+    depends_on:
+      - frontend
+      - backend
+
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+      args:
+        # The frontend will now make API calls to its own server at /api,
+        # which will be intercepted and proxied by Nginx.
+        NEXT_PUBLIC_API_URL: /api
+    # The frontend is no longer exposed directly to the host.
+    # All traffic goes through the 'proxy' service.
+    networks:
+      - portfolio-net
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
+    environment:
+      # This tells the backend to accept connections from any IP
+      # within the Docker network.
+      HOST: '0.0.0.0'
+    volumes:
+      # Mount the host's Docker socket to allow the backend to spawn sibling containers
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - portfolio-net
+
+networks:
+  portfolio-net:
+    driver: bridge
