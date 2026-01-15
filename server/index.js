@@ -76,29 +76,20 @@ app.get('/stream', async (req, res) => {
     }
 
     try {
-        // 1. Prepare: Write code & Compile
-        // This might take a second, so we await it before starting the stream headers
         const executable = await visualizationManager.prepareVisualization(sessionId, vizId);
-
-        // 2. Setup Headers for SSE
+        
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
         
-        // 3. Spawn the process
         const child = sessionManager.spawnCommand(sessionId, executable);
 
-        // 4. Pipe stdout to SSE events
         child.stdout.on('data', (chunk) => {
-            // We split by newlines to send clean events, or just send the raw chunk
-            // Ideally for terminal we want raw, but SSE needs "data: ..." format.
-            // We'll base64 encode the chunk to preserve ANSI codes safely through SSE.
             const b64 = chunk.toString('base64');
             res.write(`data: ${b64}\n\n`);
         });
 
         child.stderr.on('data', (chunk) => {
-            // Send stderr as well
             const b64 = chunk.toString('base64');
             res.write(`data: ${b64}\n\n`);
         });
@@ -108,14 +99,62 @@ app.get('/stream', async (req, res) => {
             res.end();
         });
 
-        // Handle client disconnect
         req.on('close', () => {
-            child.kill(); // Kill the process if user leaves
+            child.kill(); 
         });
 
     } catch (error) {
         console.error('Stream error:', error);
-        // If headers haven't been sent, send error json
+        if (!res.headersSent) {
+            res.status(500).json({ error: error.message });
+        } else {
+            res.end();
+        }
+    }
+});
+
+// --- STATS STREAMING ENDPOINT (SSE for 'top' command) ---
+app.get('/stats', async (req, res) => {
+    const { sessionId } = req.query;
+    if (!sessionId) {
+        return res.status(400).send('Missing sessionId');
+    }
+
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    let intervalId;
+    try {
+        const containerName = sessionManager.sessions.get(sessionId).name;
+        
+        intervalId = setInterval(async () => {
+            // docker stats --no-stream --format "{{.CPUPerc}}\t{{.MemUsage}}"
+            const statsCommand = `docker stats --no-stream --format "{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}" ${containerName}`;
+            const statsResult = await new Promise((resolve) => {
+                sessionManager.exec(statsCommand, (error, stdout, stderr) => {
+                    if (error) resolve({ error: stderr || error.message });
+                    else resolve({ output: stdout });
+                });
+            });
+
+            if (statsResult.error) {
+                res.write(`data: ${Buffer.from(statsResult.error).toString('base64')}\n\n`);
+                clearInterval(intervalId);
+                return;
+            }
+
+            res.write(`data: ${Buffer.from(statsResult.output).toString('base64')}\n\n`);
+        }, 1000); // Update every 1 second
+
+        req.on('close', () => {
+            clearInterval(intervalId);
+            res.end();
+        });
+
+    } catch (error) {
+        console.error('Stats Stream error:', error);
+        if (intervalId) clearInterval(intervalId);
         if (!res.headersSent) {
             res.status(500).json({ error: error.message });
         } else {

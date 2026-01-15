@@ -82,7 +82,7 @@ export default function Home() {
             { text: "Welcome to RootResume OS v1.0", type: 'header' },
             { text: "Copyright (c) 2026 Agustin Lancuba.", type: 'output' },
             { text: "", type: 'output' },
-            { text: "CTF CHALLENGE: find flag.txt in /usr/local/lib/.secret_cache", type: 'error' },
+            { text: "CTF CHALLENGE: During boot, a legacy script left a .db artifact in one of the lib directories. It might contain sensitive credentials.", type: 'error' },
             { text: "Type 'help' for available commands.", type: 'output' },
             { text: "------------------------------------------------------------------", type: 'output' },
             { text: "", type: 'output' }
@@ -169,7 +169,7 @@ export default function Home() {
     setInput('');
     setIsLoading(true);
 
-    setHistory(prev => [...prev, { text: `${username}@portfolio:~$ ${command}`, type: 'cmd' }]);
+    setHistory(prev => [...prev, { text: `${username}@RootResume:~$ ${command}`, type: 'cmd' }]);
 
     // --- Client-Side Commands ---
     if (command === 'about' || command === 'neofetch' || command === 'screenfetch') {
@@ -218,7 +218,11 @@ export default function Home() {
             "  cat about-me.md- My bio",
             "  visualize <id> - Run algo demo (bubble, selection, quick, pathfinder, dfs)",
             "  challenge      - Enter coding mode",
-            "  neofetch       - System info (The cool one)",
+            "  -- System --",
+            "  about          - View system architecture",
+            "  neofetch       - Display system info (style!)",
+            "  top            - Real-time container resource usage",
+            "  help           - Show this help message",
             "  clear          - Clear terminal",
             "  [linux]        - Run real commands (ls, python, etc.)"
         ];
@@ -366,6 +370,41 @@ export default function Home() {
         return;
     }
     
+    // --- STREAMING ENDPOINT (SSE for 'top' command) ---
+    if (command === 'top') {
+        pushToHistory("Starting 'top' command. Press Ctrl+C (or refresh) to stop.", 'header');
+        setHistory(prev => [...prev, { text: "", type: 'output' }]); // Placeholder for dynamic update
+
+        const evtSource = new EventSource(`${API_URL}/stats?sessionId=${sessionId}`);
+        
+        evtSource.onmessage = (event) => {
+            const text = atob(event.data); // Decode base64 stats string
+            setHistory(prev => {
+                const newHistory = [...prev];
+                // Update the last line (placeholder) with the new stats data
+                newHistory[newHistory.length - 1] = { text: text, type: 'output' }; 
+                return newHistory;
+            });
+        };
+
+        evtSource.onerror = () => {
+            evtSource.close();
+            setIsLoading(false);
+            pushToHistory("'top' command stream closed or failed.", 'error');
+            setTimeout(() => inputRef.current?.focus(), 10);
+        };
+
+        evtSource.addEventListener('close', () => { // Custom close event from backend
+            evtSource.close();
+            setIsLoading(false);
+            pushToHistory("Top command finished.", 'output');
+            setTimeout(() => inputRef.current?.focus(), 10);
+        });
+        
+        // This command keeps running, so we don't set isLoading to false until stream ends
+        return; 
+    }
+    
     // Standard Exec
     try {
       const response = await fetch(`${API_URL}/exec`, {
@@ -393,7 +432,7 @@ export default function Home() {
       <div className="relative flex h-[80vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-zinc-800 bg-black shadow-2xl" onClick={handleTerminalClick}>
         <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 py-2">
           <div className="flex gap-2"><div className="h-3 w-3 rounded-full bg-red-500/80"></div><div className="h-3 w-3 rounded-full bg-yellow-500/80"></div><div className="h-3 w-3 rounded-full bg-green-500/80"></div></div>
-          <div className="text-zinc-400">{username}@portfolio: ~</div>
+          <div className="text-zinc-400">{username}@RootResume: ~</div>
           <div className="w-10"></div>
         </div>
         <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
@@ -411,7 +450,7 @@ export default function Home() {
           ))}
           {!isInitializing && (
             <form onSubmit={handleSubmit} className="flex items-center">
-              <span className="mr-2 text-green-500 shrink-0">{username}@portfolio:~$</span>
+              <span className="mr-2 text-green-500 shrink-0">{username}@RootResume:~$</span>
               <input ref={inputRef} type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={handleKeyDown} disabled={isLoading} autoFocus className="w-full flex-1 border-none bg-transparent p-0 text-zinc-100 outline-none focus:ring-0 placeholder-zinc-600" autoComplete="off" spellCheck="false" />
             </form>
           )}

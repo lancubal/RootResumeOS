@@ -1,0 +1,3 @@
+[SessionManager] GC started. Limits: 10 containers, 1h max life.
+Server listening at http://localhost:3001
+Stateful Architecture: Ready.
