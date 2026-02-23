@@ -49,6 +49,7 @@ function PostCard({
     index: number;
 }) {
     return (
+        <Link href={`/blog/${post.slug}`}>
         <motion.article
             key={post.id}
             initial={{ opacity: 0, y: 16 }}
@@ -94,6 +95,7 @@ function PostCard({
                 Read article →
             </div>
         </motion.article>
+        </Link>
     );
 }
 
@@ -208,8 +210,7 @@ export default function BlogPage() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 }}
                     className="text-center text-zinc-300 text-xs mt-16">
-                    Full articles coming soon — these are previews of upcoming
-                    posts.
+                    More articles on the way.
                 </motion.p>
             </main>
         </div>

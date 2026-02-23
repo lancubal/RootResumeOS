@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import CodeEditor from "./CodeEditor";
-import { PROJECTS, OWNER } from "./config";
+import { PROJECTS, OWNER, SKILLS } from "./config";
 
 interface HistoryItem {
     text: string;
@@ -98,6 +98,8 @@ export default function RootResumeTerminal({
         "ls projects",
         "cat about-me.md",
         "visualize",
+        "skills",
+        "matrix",
         "challenge",
         "start",
         "edit",
@@ -464,10 +466,12 @@ export default function RootResumeTerminal({
             const helpLines = [
                 "Available Commands:",
                 "  ls projects    - View my projects",
+                "  skills         - Proficiency bar chart",
                 "  cat about-me.md- My bio",
                 "  visualize <id> - Run algo demo:",
                 "    C:      bubble, selection, quick, pathfinder, dfs",
                 "    Python: life, mandelbrot, montecarlo, maze",
+                "  matrix         - 👀",
                 "  challenge      - Enter coding mode",
                 "  command &      - Run a command in the background",
                 "  -- System --",
@@ -484,6 +488,75 @@ export default function RootResumeTerminal({
             setHistory([]);
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
+
+        } else if (command === "skills") {
+            const BAR_WIDTH = 12;
+            const CATEGORIES = ["Languages", "Backend", "Frontend", "DevOps"] as const;
+            pushToHistory("─".repeat(44));
+            pushToHistory("  SKILL PROFICIENCY");
+            pushToHistory("─".repeat(44));
+            CATEGORIES.forEach((cat) => {
+                pushToHistory("");
+                pushToHistory(`  [${cat}]`);
+                SKILLS.filter((s) => s.category === cat).forEach((s) => {
+                    const filled = Math.round((s.level / 100) * BAR_WIDTH);
+                    const bar = "█".repeat(filled) + "░".repeat(BAR_WIDTH - filled);
+                    const label = s.name.padEnd(12, " ");
+                    pushToHistory(`  ${label} ${bar}  ${s.level}%`);
+                });
+            });
+            pushToHistory("");
+            pushToHistory("─".repeat(44));
+            setIsLoading(false);
+            setTimeout(() => inputRef.current?.focus(), 10);
+
+        } else if (command === "matrix") {
+            const COLS = 60;
+            const ROWS = 18;
+            const CHARS = "ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝABCDEFGHIJKL0123456789";
+            const drops = Array.from({ length: COLS }, () => Math.floor(Math.random() * ROWS));
+            const grid: string[][] = Array.from({ length: ROWS }, () => Array(COLS).fill(" "));
+            let frameCount = 0;
+            const maxFrames = 80;
+
+            const renderFrame = () => {
+                // advance drops
+                drops.forEach((row, col) => {
+                    const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
+                    if (row < ROWS) grid[row][col] = ch;
+                    drops[col] = (row + 1) % (ROWS + Math.floor(Math.random() * 8));
+                    // fade tail
+                    if (row - 1 >= 0) grid[row - 1][col] = CHARS[Math.floor(Math.random() * CHARS.length)];
+                    if (row - 3 >= 0) grid[row - 3][col] = " ";
+                });
+                return grid.map((r) => r.join("")).join("\n");
+            };
+
+            pushToHistory("[matrix] Press Ctrl+C to exit");
+            setHistory((prev) => [...prev, { text: "", type: "output" }]);
+
+            const interval = setInterval(() => {
+                if (frameCount >= maxFrames || !streamRef.current) {
+                    clearInterval(interval);
+                    streamRef.current = null;
+                    setHistory((prev) => [...prev, { text: "[matrix] Simulation ended.", type: "output" }]);
+                    setIsLoading(false);
+                    setTimeout(() => inputRef.current?.focus(), 10);
+                    return;
+                }
+                const frame = renderFrame();
+                setHistory((prev) => {
+                    const next = [...prev];
+                    next[next.length - 1] = { text: frame, type: "output" };
+                    return next;
+                });
+                frameCount++;
+            }, 80);
+
+            // store a fake EventSource-shaped object so Ctrl+C can kill it
+            streamRef.current = { close: () => clearInterval(interval) } as unknown as EventSource;
+            setIsLoading(true);
+
         } else if (command === "ls projects") {
             pushToHistory(
                 JSON.stringify(

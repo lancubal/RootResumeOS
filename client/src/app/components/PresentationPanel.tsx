@@ -12,7 +12,7 @@ import {
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { OWNER } from "../config";
+import { OWNER, SKILLS, SKILL_CATEGORY_COLORS, type SkillCategory } from "../config";
 
 export function PresentationPanel() {
     const socialLinks = [
@@ -76,7 +76,28 @@ export function PresentationPanel() {
                     {OWNER.description}
                 </motion.p>
 
-                {/* Row — Explore (right below description) */}
+                {/* Skills pills */}
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.35 }}
+                className="flex flex-wrap gap-1.5 mb-5">
+                {SKILLS.map((skill, i) => (
+                    <motion.span
+                        key={skill.name}
+                        initial={{ opacity: 0, scale: 0.85 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.25, delay: 0.35 + i * 0.03 }}
+                        title={`${skill.level}%`}
+                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+                            SKILL_CATEGORY_COLORS[skill.category as SkillCategory]
+                        }`}>
+                        {skill.name}
+                    </motion.span>
+                ))}
+            </motion.div>
+
+            {/* Row — Explore (right below description) */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
