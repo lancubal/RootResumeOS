@@ -35,8 +35,15 @@ export default function Home() {
 
                 {/* Right — Terminal + Quick Actions */}
                 <div
-                    className="flex flex-col p-4 gap-3"
+                    className="flex flex-col p-4 gap-3 min-h-0 overflow-hidden"
                     style={{ backgroundColor: "#f6f6f7" }}>
+                    {/* Terminal — fills remaining height */}
+                    <div className="flex-1 min-h-0">
+                        <RootResumeTerminal
+                            command={currentCommand}
+                            onCommandExecuted={() => setCurrentCommand("")}
+                        />
+                    </div>
                     {/* Quick Actions */}
                     <div className="flex-shrink-0">
                         <div className="text-xs text-zinc-500 mb-2 uppercase tracking-widest flex items-center gap-2">
@@ -61,13 +68,6 @@ export default function Home() {
                                 </motion.button>
                             ))}
                         </div>
-                    </div>
-                    {/* Terminal — fills remaining height */}
-                    <div className="flex-1 min-h-0">
-                        <RootResumeTerminal
-                            command={currentCommand}
-                            onCommandExecuted={() => setCurrentCommand("")}
-                        />
                     </div>
                 </div>
             </div>
@@ -114,8 +114,16 @@ export default function Home() {
                                         className="absolute top-5 right-5 w-9 h-9 bg-zinc-700 text-white rounded-full flex items-center justify-center z-10 shadow-lg">
                                         <X className="w-4 h-4" />
                                     </button>
+                                    <div className="flex-1 min-h-0">
+                                        <RootResumeTerminal
+                                            command={currentCommand}
+                                            onCommandExecuted={() =>
+                                                setCurrentCommand("")
+                                            }
+                                        />
+                                    </div>
                                     {/* Quick Actions in mobile drawer */}
-                                    <div className="flex-shrink-0 pt-1 flex flex-wrap gap-2">
+                                    <div className="flex-shrink-0 flex flex-wrap gap-2">
                                         {QUICK_COMMANDS.map((cmd, index) => (
                                             <motion.button
                                                 key={index}
@@ -134,14 +142,6 @@ export default function Home() {
                                                 <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
                                             </motion.button>
                                         ))}
-                                    </div>
-                                    <div className="flex-1 min-h-0">
-                                        <RootResumeTerminal
-                                            command={currentCommand}
-                                            onCommandExecuted={() =>
-                                                setCurrentCommand("")
-                                            }
-                                        />
                                     </div>
                                 </div>
                             </motion.div>

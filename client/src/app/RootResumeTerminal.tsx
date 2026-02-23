@@ -698,7 +698,7 @@ export default function RootResumeTerminal({
                 onClose={handleEditorClose}
             />
             <div
-                className="relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-lg border border-zinc-800 bg-black shadow-2xl"
+                className="relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-lg border border-zinc-800 bg-black shadow-2xl font-mono text-sm"
                 onClick={handleTerminalClick}>
                 <div className="flex items-center justify-center border-b border-zinc-800 bg-gray-800 px-4 py-2">
                     <div className="text-zinc-400 text-sm font-bold">
