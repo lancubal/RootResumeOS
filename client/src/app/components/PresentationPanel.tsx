@@ -1,7 +1,9 @@
 "use client";
 
-import { Github, Linkedin, Mail, FileDown } from "lucide-react";
+import { Github, Linkedin, Mail, FileDown, BookOpen } from "lucide-react";
 import { motion } from "motion/react";
+import Image from "next/image";
+import Link from "next/link";
 import { OWNER } from "../config";
 
 export function PresentationPanel() {
@@ -13,20 +15,40 @@ export function PresentationPanel() {
 
     return (
         <div className="h-full flex flex-col justify-center px-8 lg:px-12 py-12">
-            {/* Header */}
+            {/* Avatar + Header row */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}>
-                <div className="text-zinc-500 mb-2 text-sm">
-                    {OWNER.greeting}
+                transition={{ duration: 0.6 }}
+                className="flex items-center gap-6 mb-6">
+                {/* Circular avatar — place your photo at /public/avatar.jpg */}
+                <div className="relative shrink-0 w-24 h-24 lg:w-28 lg:h-28">
+                    <div className="w-full h-full rounded-full ring-4 ring-zinc-200 overflow-hidden shadow-lg">
+                        <Image
+                            src="/avatar.jpg"
+                            alt={OWNER.name}
+                            width={112}
+                            height={112}
+                            className="w-full h-full object-cover"
+                            priority
+                        />
+                    </div>
+                    {/* Online indicator */}
+                    <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow" />
                 </div>
-                <h1 className="text-5xl lg:text-6xl font-bold mb-4 bg-gradient-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent">
-                    {OWNER.name}
-                </h1>
-                <h2 className="text-lg lg:text-xl text-zinc-600 mb-8">
-                    {OWNER.title}
-                </h2>
+
+                {/* Name + title */}
+                <div>
+                    <div className="text-zinc-500 mb-1 text-sm">
+                        {OWNER.greeting}
+                    </div>
+                    <h1 className="text-4xl lg:text-5xl font-bold mb-1 bg-gradient-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent">
+                        {OWNER.name}
+                    </h1>
+                    <h2 className="text-base lg:text-lg text-zinc-600">
+                        {OWNER.title}
+                    </h2>
+                </div>
             </motion.div>
 
             {/* Description */}
@@ -38,7 +60,7 @@ export function PresentationPanel() {
                 {OWNER.description}
             </motion.p>
 
-            {/* Social Links + CV */}
+            {/* Social Links + CV + About */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -66,6 +88,18 @@ export function PresentationPanel() {
                     <span>Download CV</span>
                     <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
                 </motion.a>
+
+                <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}>
+                    <Link
+                        href="/about"
+                        className="group relative px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-medium shadow-lg hover:shadow-xl transition-all overflow-hidden flex items-center gap-2">
+                        <BookOpen className="w-4 h-4" />
+                        <span>About this portfolio</span>
+                        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+                    </Link>
+                </motion.div>
             </motion.div>
         </div>
     );

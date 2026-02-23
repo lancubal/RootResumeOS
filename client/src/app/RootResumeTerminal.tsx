@@ -7,10 +7,58 @@ import { PROJECTS, OWNER } from "./config";
 
 interface HistoryItem {
     text: string;
-    type?: "cmd" | "output" | "error" | "header" | "logo" | "info";
+    type?: "cmd" | "output" | "error" | "header" | "logo" | "info" | "viz";
     cwd?: string;
     username?: string;
 }
+
+const VIZ_DESCRIPTIONS: Record<string, string[]> = {
+    bubble: [
+        "Bubble Sort  |  O(n²) time  |  O(1) space",
+        "Repeatedly steps through the list, compares adjacent elements and swaps",
+        "them if out of order. The largest values 'bubble up' to the end.",
+    ],
+    selection: [
+        "Selection Sort  |  O(n²) time  |  O(1) space",
+        "Scans the unsorted portion for the minimum element and swaps it into",
+        "its correct position at the front of the sorted region.",
+    ],
+    quick: [
+        "Quick Sort  |  O(n log n) avg, O(n²) worst  |  O(log n) space",
+        "Divide & Conquer: picks a pivot, partitions the array so that all",
+        "smaller elements are left of it, larger to the right, then recurses.",
+    ],
+    pathfinder: [
+        "BFS Pathfinding  |  O(V + E)  |  Guarantees shortest path",
+        "Explores all nodes at the current depth before moving deeper.",
+        "Uses a queue — expansion spreads like a ripple from the start (S) to end (E).",
+    ],
+    dfs: [
+        "DFS Pathfinding  |  O(V + E)  |  Does NOT guarantee shortest path",
+        "Plunges as deep as possible along one branch before backtracking.",
+        "Uses recursion (implicit call-stack) — can find long winding paths.",
+    ],
+    life: [
+        "Conway's Game of Life  |  Cellular Automaton  |  Rule B3/S23",
+        "Each cell lives or dies based on its 8 neighbors each generation:",
+        "Born if exactly 3 neighbors alive | Survives with 2–3 | Dies otherwise.",
+    ],
+    mandelbrot: [
+        "Mandelbrot Set  |  Fractal  |  f(z) = z² + c",
+        "For each pixel c in the complex plane, iterate z = z² + c from z=0.",
+        "Char density shows iteration depth before |z| > 2 — revealing infinite boundary detail.",
+    ],
+    montecarlo: [
+        "Monte Carlo π Estimation  |  Probabilistic  |  Convergence: O(1/√n)",
+        "Scatter random points in a 2×2 square; count those inside the unit circle.",
+        "Ratio inside/total ≈ π/4 — more samples → better approximation of π.",
+    ],
+    maze: [
+        "Maze Gen + Solver  |  Gen: DFS recursive backtracker  |  Solve: BFS",
+        "Phase 1 — Generation: carve passages using randomized depth-first search.",
+        "Phase 2 — Solving: find shortest path S→E with breadth-first search (*=path, .=explored).",
+    ],
+};
 
 interface TerminalProps {
     /** Command injected from the GUI quick-buttons */
@@ -581,6 +629,12 @@ export default function RootResumeTerminal({
                     );
                 }
 
+                const desc = VIZ_DESCRIPTIONS[vizId];
+                if (desc) {
+                    pushToHistory("");
+                    desc.forEach((line) => pushToHistory(line, "viz"));
+                    pushToHistory("");
+                }
                 pushToHistory(`Starting ${vizId} visualization...`);
                 const evtSource = new EventSource(
                     `${API_URL}/stream?sessionId=${sessionId}&vizId=${vizId}`,
@@ -749,7 +803,9 @@ export default function RootResumeTerminal({
                                                 ? "text-yellow-400"
                                                 : item.type === "logo"
                                                   ? "text-emerald-500"
-                                                  : "text-zinc-300"
+                                                  : item.type === "viz"
+                                                    ? "text-cyan-400 italic"
+                                                    : "text-zinc-300"
                                     }>
                                     {item.text}
                                 </div>
