@@ -417,7 +417,9 @@ export default function RootResumeTerminal({
                 "Available Commands:",
                 "  ls projects    - View my projects",
                 "  cat about-me.md- My bio",
-                "  visualize <id> - Run algo demo (bubble, selection, quick, pathfinder, dfs)",
+                "  visualize <id> - Run algo demo:",
+                "    C:      bubble, selection, quick, pathfinder, dfs",
+                "    Python: life, mandelbrot, montecarlo, maze",
                 "  challenge      - Enter coding mode",
                 "  command &      - Run a command in the background",
                 "  -- System --",
@@ -556,15 +558,28 @@ export default function RootResumeTerminal({
                 const vizId = command.split(" ")[1];
                 if (streamRef.current) streamRef.current.close();
 
-                // --- Narrative UX ---
-                pushToHistory(
-                    `[Narrator] Compiling ${vizId}.c with GCC inside the secure container...`,
-                    "info",
-                );
-                pushToHistory(
-                    `[Narrator] Executing binary and streaming STDOUT via Server-Sent Events...`,
-                    "info",
-                );
+                const pythonViz = ["life", "mandelbrot", "montecarlo", "maze"];
+                const isPython = pythonViz.includes(vizId);
+
+                if (isPython) {
+                    pushToHistory(
+                        `[Narrator] Writing Python script to container filesystem...`,
+                        "info",
+                    );
+                    pushToHistory(
+                        `[Narrator] Executing with python3 and streaming STDOUT via SSE...`,
+                        "info",
+                    );
+                } else {
+                    pushToHistory(
+                        `[Narrator] Compiling ${vizId}.c with GCC inside the secure container...`,
+                        "info",
+                    );
+                    pushToHistory(
+                        `[Narrator] Executing binary and streaming STDOUT via Server-Sent Events...`,
+                        "info",
+                    );
+                }
 
                 pushToHistory(`Starting ${vizId} visualization...`);
                 const evtSource = new EventSource(
