@@ -604,7 +604,7 @@ python3 ./maze_app.py  # stdout → SSE frames`}</CodeBlock>
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.9 }}
                     className="text-center text-zinc-400 text-sm pb-8">
-                    Built by Agustin Lancuba · {new Date().getFullYear()}
+                    Built by Luna Lancuba · {new Date().getFullYear()}
                 </motion.div>
             </main>
         </div>

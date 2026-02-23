@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Agustin Lancuba — Portfolio",
+    title: "Luna Lancuba — Portfolio",
     description:
-        "Full Stack Developer. Explora mi trabajo en una terminal Linux real dentro de tu browser.",
+        "Full Stack Developer. Explore my work in a real Linux terminal inside your browser.",
 };
 
 export default function RootLayout({

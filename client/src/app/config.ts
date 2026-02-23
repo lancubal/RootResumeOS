@@ -3,7 +3,7 @@
 // ============================================================
 
 export const OWNER = {
-  name: 'Agustin Lancuba',
+  name: 'Luna Lancuba',
   title: 'Full Stack Developer | Migrating monoliths to microservices',
   greeting: '👋 Hi, I\'m',
   bio: [
@@ -11,7 +11,7 @@ export const OWNER = {
     'I build systems that are secure by design and pleasant to use.',
     'This portfolio is proof of that: a fully functional RCE environment.',
     '',
-    'Contact: agustinlancuba.sistemas@gmail.com',
+    'Contact: lunalancuba.sistemas@gmail.com',
   ].join('\n'),
   description:
     'I build scalable architectures and transform legacy systems. ' +
@@ -19,8 +19,8 @@ export const OWNER = {
   cv: 'https://drive.google.com/your-cv-link', // ← replace with your real URL
   social: {
     github:   'https://github.com/lancubal',
-    linkedin: 'https://linkedin.com/in/agustinlancuba',
-    email:    'agustinlancuba.sistemas@gmail.com',
+    linkedin: 'https://linkedin.com/in/lunalancuba',
+    email:    'lunalancuba.sistemas@gmail.com',
   },
 };
 

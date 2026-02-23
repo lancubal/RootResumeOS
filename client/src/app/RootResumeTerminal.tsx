@@ -208,7 +208,7 @@ export default function RootResumeTerminal({
                             type: "header",
                         },
                         {
-                            text: "Copyright (c) 2026 Agustin Lancuba.",
+                            text: "Copyright (c) 2026 Luna Lancuba.",
                             type: "output",
                         },
                         { text: "", type: "output" },

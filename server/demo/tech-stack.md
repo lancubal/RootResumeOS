@@ -1,4 +1,4 @@
-# Tech Stack — Agustin Lancuba
+# Tech Stack — Luna Lancuba
 
 ## Backend
 - Node.js / Express  — APIs REST y microservicios

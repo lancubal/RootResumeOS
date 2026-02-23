@@ -60,12 +60,12 @@ export function PresentationPanel() {
                 {OWNER.description}
             </motion.p>
 
-            {/* Social Links + CV + About */}
+            {/* Row 1 — Social icons */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
-                className="flex flex-wrap items-center gap-3">
+                className="flex items-center gap-3 mb-3">
                 {socialLinks.map((social, index) => (
                     <a
                         key={index}
@@ -77,6 +77,14 @@ export function PresentationPanel() {
                         <social.icon className="w-5 h-5 text-zinc-600" />
                     </a>
                 ))}
+            </motion.div>
+
+            {/* Row 2 — Navigation buttons */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.75 }}
+                className="flex flex-wrap items-center gap-3">
                 <motion.a
                     href={OWNER.cv}
                     target="_blank"
@@ -89,21 +97,7 @@ export function PresentationPanel() {
                     <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
                 </motion.a>
 
-                <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}>
-                    <Link
-                        href="/about"
-                        className="group relative px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-medium shadow-lg hover:shadow-xl transition-all overflow-hidden flex items-center gap-2">
-                        <BookOpen className="w-4 h-4" />
-                        <span>About this portfolio</span>
-                        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
-                    </Link>
-                </motion.div>
-
-                <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link
                         href="/projects"
                         className="group relative px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium shadow-lg hover:shadow-xl transition-all overflow-hidden flex items-center gap-2">
@@ -113,14 +107,22 @@ export function PresentationPanel() {
                     </Link>
                 </motion.div>
 
-                <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link
                         href="/blog"
                         className="group relative px-5 py-2.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-sm font-medium shadow-lg hover:shadow-xl transition-all overflow-hidden flex items-center gap-2">
                         <Newspaper className="w-4 h-4" />
                         <span>Blog</span>
+                        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+                    </Link>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Link
+                        href="/about"
+                        className="group relative px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-medium shadow-lg hover:shadow-xl transition-all overflow-hidden flex items-center gap-2">
+                        <BookOpen className="w-4 h-4" />
+                        <span>About this portfolio</span>
                         <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
                     </Link>
                 </motion.div>
