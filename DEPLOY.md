@@ -1,79 +1,156 @@
-# Guía de Despliegue en Producción - RootResume
+# Guía de Despliegue en Producción (AWS) - RootResume
 
-Esta guía detalla los métodos para desplegar el proyecto RootResume en un entorno de producción.
+Esta guía detalla el despliegue de la aplicación en AWS utilizando un flujo de trabajo de CI/CD con GitHub Actions, Amazon ECR (Elastic Container Registry) y una instancia EC2. Este es el método recomendado para un entorno de producción robusto y escalable.
 
-## Estrategia 1: CI/CD con GitHub Actions y Docker Hub (Recomendado)
+## Arquitectura de Despliegue
 
-Este es el enfoque de mejores prácticas. Automatiza la construcción y el versionado de imágenes Docker, garantizando un despliegue rápido, fiable y consistente.
+El flujo de trabajo es el siguiente:
 
-### Flujo de Trabajo
-
-1.  **Push a `master`**: Cada vez que se hace un push al branch `master`, se dispara un workflow de GitHub Actions.
-2.  **Construcción y Push de Imágenes (CI)**:
-    *   El workflow construye las imágenes Docker para el backend y el `portfolio-runner`.
-    *   Etiqueta las imágenes con `latest` y el hash del commit de Git (ej. `your-username/portfolio-runner:latest`, `your-username/portfolio-runner:a1b2c3d`).
-    *   Sube (`docker push`) las imágenes a un registro de contenedores como Docker Hub o AWS ECR.
-3.  **Despliegue en el Servidor (CD)**:
-    *   Te conectas por SSH a tu instancia de producción.
-    *   Ejecutas un script simple (`deploy.sh`) que:
-        *   Hace `docker-compose pull` para descargar las últimas imágenes desde el registro.
-        *   Hace `docker-compose up -d` para reiniciar los servicios con las nuevas imágenes.
-
-### Pasos de Configuración Inicial
-
-1.  **Configura un Registro de Contenedores**:
-    *   Crea una cuenta en [Docker Hub](https://hub.docker.com/) (gratuito para repositorios públicos).
-    *   Crea dos repositorios: uno para el `backend` y otro para el `portfolio-runner`.
-
-2.  **Configura GitHub Actions**:
-    *   En tu repositorio de GitHub, ve a `Settings -> Secrets and variables -> Actions`.
-    *   Añade los siguientes secretos:
-        *   `DOCKERHUB_USERNAME`: Tu nombre de usuario de Docker Hub.
-        *   `DOCKERHUB_TOKEN`: Un token de acceso personal de Docker Hub.
-
-3.  **Crea el Workflow de CI/CD**:
-    *   Crea un archivo `.github/workflows/ci-cd.yml` en tu repositorio con la lógica para construir y pushear las imágenes.
-
-4.  **Configura el Servidor de Producción**:
-    *   Aprovisiona un servidor con Docker y Docker Compose (puedes usar `setup.sh` como base).
-    *   Crea un archivo `docker-compose.yml` en el servidor que defina tus servicios (backend, frontend, etc.) y apunte a las imágenes en tu registro.
+1.  **Código Fuente (GitHub)**: Actúa como la única fuente de verdad.
+2.  **Integración Continua (GitHub Actions)**: Un `push` al branch `master` dispara un workflow que automáticamente construye, etiqueta y sube las imágenes Docker de nuestros servicios (`frontend`, `backend`, `portfolio-runner`) a Amazon ECR.
+3.  **Registro de Contenedores (Amazon ECR)**: Almacena de forma segura y privada nuestras imágenes Docker versionadas.
+4.  **Servidor de Producción (AWS EC2)**: Una instancia EC2 ejecuta la aplicación. Para desplegar o actualizar, simplemente descarga las últimas imágenes desde ECR y reinicia los servicios usando Docker Compose.
+5.  **Proxy Inverso (Nginx)**: Se ejecuta en la instancia EC2 para gestionar el tráfico entrante, dirigir las peticiones al contenedor correcto y manejar el cifrado SSL.
 
 ---
 
-## Estrategia 2: Despliegue Manual (Método Simple)
+## Paso 1: Configurar AWS ECR (Elastic Container Registry)
 
-Este método es más rápido de configurar pero menos robusto. Implica construir las imágenes directamente en la máquina de producción.
+ECR es nuestro almacén privado de imágenes Docker.
 
-### Requisitos Previos
+1.  **Navega a ECR**: En la consola de AWS, busca y selecciona `Elastic Container Registry`.
+2.  **Crea los Repositorios**: Necesitamos tres repositorios. Haz clic en "Create repository" y créalos:
+    *   **Visibilidad**: `Private`.
+    *   **Nombre del Repositorio**:
+        *   `rootresume/frontend`
+        *   `rootresume/backend`
+        *   `rootresume/portfolio-runner`
+3.  **Toma nota de los URIs**: Una vez creados, cada repositorio tendrá un URI único. Lo necesitarás para el siguiente paso. Se verá algo así: `123456789012.dkr.ecr.us-east-1.amazonaws.com/rootresume/frontend`.
 
-1.  **Servidor**: Una instancia de Ubuntu 22.04/24.04 LTS con acceso SSH y privilegios `sudo`.
-2.  **Dominio**: Un nombre de dominio apuntando a la IP de tu servidor.
-3.  **Cliente Git**: Git instalado en tu máquina local.
+---
 
-### Pasos
+## Paso 2: Configurar GitHub Actions para CI/CD
 
-1.  **Aprovisionamiento del Servidor**:
-    *   Conéctate a tu servidor (`ssh ubuntu@<TU_IP_PUBLICA>`).
-    *   Copia y ejecuta el script `infrastructure/setup.sh`.
-    *   **Importante**: Cierra la sesión y vuelve a iniciarla para aplicar los permisos de Docker.
+Esto automatizará la construcción y publicación de nuestras imágenes.
 
-2.  **Configuración del Proyecto**:
-    *   Clona tu repositorio: `git clone https://github.com/tu-usuario/tu-repositorio.git`.
-    *   Navega al directorio del proyecto.
+1.  **Crear un Rol IAM para GitHub Actions**:
+    *   En la consola de AWS, ve a `IAM -> Roles -> Create role`.
+    *   **Trusted entity type**: `Web identity`.
+    *   **Identity provider**: Elige `GitHub`.
+    *   **Audience**: `sts.amazonaws.com`.
+    *   **GitHub organization**: Tu nombre de usuario de GitHub (ej. `lancubal`).
+    *   **GitHub repository**: `RootResumeOS`.
+    *   **Permissions**: Asigna la política `AmazonEC2ContainerRegistryFullAccess`. Esto le da a GitHub Actions los permisos justos y necesarios para subir imágenes a ECR.
+    *   Nombra el rol (ej. `GitHubActions_ECR_Access`) y créalo. Anota el **ARN** del rol.
 
-3.  **Construye las Imágenes Docker**:
-    *   `cd server && docker build -t portfolio-runner . && cd ..`
+2.  **Configurar Secretos en GitHub**:
+    *   En tu repositorio de GitHub, ve a `Settings -> Secrets and variables -> Actions`.
+    *   Crea los siguientes secretos:
+        *   `AWS_REGION`: La región de AWS donde creaste tus repositorios ECR (ej. `us-east-1`).
+        *   `AWS_ROLE_TO_ASSUME`: El ARN del rol IAM que creaste en el paso anterior.
+        *   `ECR_REGISTRY`: El URI de tu registro de ECR (la parte sin el nombre del repositorio, ej. `123456789012.dkr.ecr.us-east-1.amazonaws.com`).
 
-4.  **Instala Dependencias y Ejecuta**:
-    *   `cd server && npm install && cd ..`
-    *   Usa `pm2` para iniciar el backend: `pm2 start infrastructure/ecosystem.config.js`.
+3.  **Crear el Workflow de GitHub Actions**:
+    *   Crea el archivo `.github/workflows/deploy.yml` en tu repositorio. Este workflow se encargará de construir y subir las tres imágenes Docker a sus respectivos repositorios en ECR cada vez que hagas un `push` a `master`. (El contenido exacto del YAML se puede generar según las plantillas estándar de GitHub para build/push a ECR).
 
-5.  **Configura Nginx y SSL**:
-    *   Crea un archivo de configuración en `/etc/nginx/sites-available/` para tu dominio, usando `infrastructure/nginx.conf` como plantilla.
-    *   Habilita el sitio y usa `certbot` para obtener un certificado SSL.
-    *   Recarga Nginx: `sudo systemctl reload nginx`.
+---
 
-6.  **Despliega el Frontend**:
-    *   Puedes usar Vercel (recomendado, ver Opción A en el `README.md` original) o servirlo desde el mismo servidor (Opción B).
+## Paso 3: Aprovisionar y Configurar la Instancia EC2
 
-Este método funciona, pero se recomienda migrar a una estrategia de CI/CD para cualquier proyecto serio.
+Este será nuestro servidor de producción.
+
+1.  **Lanzar Instancia EC2**:
+    *   **AMI**: Elige una AMI reciente de **Ubuntu** (ej. 22.04 LTS).
+    *   **Tipo de Instancia**: `t3.small` o `t3.medium` es un buen punto de partida.
+    *   **Key Pair**: Asigna o crea un key pair para poder acceder por SSH.
+    *   **Grupo de Seguridad**: Crea un nuevo grupo de seguridad que permita tráfico entrante en:
+        *   **Puerto 22 (SSH)**: Desde tu IP para poder administrarla.
+        *   **Puerto 80 (HTTP)**: Desde cualquier lugar (`0.0.0.0/0`).
+        *   **Puerto 443 (HTTPS)**: Desde cualquier lugar (`0.0.0.0/0`).
+    *   **Rol IAM**: **Importante**: Asigna un rol IAM a la instancia que le dé permisos para descargar imágenes de ECR (`AmazonEC2ContainerRegistryReadOnly`). Esto es más seguro que guardar credenciales en la instancia.
+
+2.  **Configurar la Instancia**:
+    *   Conéctate por SSH: `ssh ubuntu@<tu-ip-publica> -i tu-llave.pem`.
+    *   **Instalar dependencias**: Ejecuta los siguientes comandos:
+        ```bash
+        sudo apt-get update && sudo apt-get upgrade -y
+        # Instalar Docker, Docker Compose y Nginx
+        sudo apt-get install -y docker.io docker-compose nginx
+        # Añadir usuario al grupo de docker y aplicar cambios
+        sudo usermod -aG docker $USER
+        newgrp docker 
+        ```
+
+---
+
+## Paso 4: Desplegar la Aplicación en EC2
+
+El paso final es ejecutar la aplicación usando las imágenes de ECR.
+
+1.  **Crear `docker-compose.yml` en EC2**:
+    *   En la instancia, crea un archivo `docker-compose.yml`. **Este no es el mismo que usamos para desarrollo local**. Es una versión simplificada para producción.
+
+    ```yaml
+    version: '3.8'
+    
+    services:
+      proxy:
+        image: nginx:1.25-alpine
+        volumes:
+          - ./nginx.conf:/etc/nginx/nginx.conf:ro
+        ports:
+          - "80:80"
+        networks:
+          - portfolio-net
+        depends_on:
+          - frontend
+          - backend
+
+      frontend:
+        image: ${ECR_REGISTRY}/rootresume/frontend:latest
+        networks:
+          - portfolio-net
+
+      backend:
+        image: ${ECR_REGISTRY}/rootresume/backend:latest
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+          - portfolio-net
+
+    networks:
+      portfolio-net:
+        driver: bridge
+    ```
+    *Nota: Este archivo asume que la variable de entorno `ECR_REGISTRY` está definida en la sesión del shell o en un archivo `.env`.*
+
+2.  **Crear `nginx.conf` en EC2**:
+    *   Crea el archivo `nginx.conf` en el mismo directorio.
+    *   **Importante**: En la sección `server`, cambia `server_name` a tu dominio real (ej. `rootresume.io`).
+
+3.  **Obtener credenciales de ECR**:
+    ```bash
+    aws ecr get-login-password --region <tu-region> | docker login --username AWS --password-stdin <tu-uri-de-ecr>
+    ```
+
+4.  **Lanzar la aplicación**:
+    ```bash
+    # Descarga las últimas imágenes de ECR
+    docker-compose pull
+    # Inicia los contenedores en segundo plano
+    docker-compose up -d
+    ```
+
+5.  **Configurar SSL con Certbot**:
+    *   Instala Certbot: `sudo apt-get install -y certbot python3-certbot-nginx`.
+    *   Ejecuta Certbot para obtener el certificado e instalarlo en tu configuración de Nginx (que se está ejecutando fuera de Docker):
+        ```bash
+        # Primero, detén temporalmente docker-compose para liberar el puerto 80
+        docker-compose down
+        # Ejecuta certbot
+        sudo certbot --nginx -d tu-dominio.com
+        # Vuelve a levantar la aplicación
+        docker-compose up -d
+        ```
+
+¡Tu aplicación ahora está desplegada en producción, con un flujo de CI/CD completamente funcional!
