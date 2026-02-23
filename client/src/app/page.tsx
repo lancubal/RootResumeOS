@@ -15,20 +15,23 @@ export default function Home() {
         if (window.innerWidth < 1024) {
             setIsTerminalOpen(true);
         }
-        // currentCommand se limpia desde la terminal vía onCommandExecuted
+        // currentCommand is cleared by the terminal via onCommandExecuted
     };
 
     return (
-        <div className="h-screen w-screen overflow-hidden bg-gradient-to-br from-zinc-50 to-zinc-100">
+        <div className="h-screen w-screen overflow-hidden" style={{ backgroundColor: '#f6f6f7' }}>
             {/* ── Desktop: split screen ── */}
-            <div className="hidden lg:grid lg:grid-cols-[1.2fr_1fr] h-full">
+            <div className="hidden lg:grid lg:grid-cols-[1.2fr_2px_1fr] h-full">
                 {/* Left — GUI */}
-                <div className="overflow-y-auto border-r border-zinc-200">
+                <div className="overflow-y-auto">
                     <PresentationPanel onCommandClick={handleCommandClick} />
                 </div>
 
+                {/* Separator */}
+                <div className="bg-zinc-300 self-stretch my-8 rounded-full" />
+
                 {/* Right — Terminal */}
-                <div className="p-6 flex items-stretch bg-zinc-950">
+                <div className="p-6 flex items-stretch" style={{ backgroundColor: '#f6f6f7' }}>
                     <div className="w-full">
                         <RootResumeTerminal
                             command={currentCommand}

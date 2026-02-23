@@ -49,7 +49,7 @@ export function PresentationPanel({ onCommandClick }: PresentationPanelProps) {
                 transition={{ duration: 0.6, delay: 0.4 }}
                 className="mb-10">
                 <div className="text-xs text-zinc-500 mb-3 uppercase tracking-widest">
-                    Accesos Rápidos
+                    Quick Actions
                 </div>
                 <div className="flex flex-wrap gap-3">
                     {QUICK_COMMANDS.map((cmd, index) => (
@@ -67,7 +67,7 @@ export function PresentationPanel({ onCommandClick }: PresentationPanelProps) {
                         </motion.button>
                     ))}
 
-                    {/* CV — link directo, no ejecuta terminal */}
+                    {/* CV — direct link, does not run a terminal command */}
                     <motion.a
                         href={OWNER.cv}
                         target="_blank"
@@ -76,14 +76,13 @@ export function PresentationPanel({ onCommandClick }: PresentationPanelProps) {
                         whileTap={{ scale: 0.95 }}
                         className="group relative px-5 py-2.5 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-medium shadow-lg hover:shadow-xl transition-all overflow-hidden flex items-center gap-2">
                         <FileDown className="w-4 h-4" />
-                        <span>Descargar CV</span>
+                        <span>Download CV</span>
                         <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
                     </motion.a>
                 </div>
                 <div className="text-xs text-zinc-400 mt-3 flex items-center gap-2">
                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                    Los botones de colores ejecutan comandos reales en la
-                    terminal →
+                    Colored buttons run real commands in the terminal →
                 </div>
             </motion.div>
 
@@ -116,11 +115,11 @@ export function PresentationPanel({ onCommandClick }: PresentationPanelProps) {
                     <span className="text-xl">💡</span>
                     <div>
                         <div className="text-sm font-medium text-zinc-700 mb-1">
-                            Para usuarios técnicos
+                            For technical users
                         </div>
                         <div className="text-xs text-zinc-500 leading-relaxed">
-                            La terminal es completamente funcional — corre en un
-                            contenedor Docker real. Probá{" "}
+                            The terminal is fully functional — runs in a real
+                            Docker container. Try{" "}
                             <code className="px-1.5 py-0.5 bg-zinc-200 rounded text-zinc-700">
                                 help
                             </code>
