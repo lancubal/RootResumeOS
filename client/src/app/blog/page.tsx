@@ -29,9 +29,10 @@ function TagPill({
         <button
             onClick={onClick}
             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all
-                ${active
-                    ? "bg-rose-600 text-white border-rose-600 shadow"
-                    : "bg-zinc-100 text-zinc-600 border-zinc-200 hover:bg-zinc-200"
+                ${
+                    active
+                        ? "bg-rose-600 text-white border-rose-600 shadow"
+                        : "bg-zinc-100 text-zinc-600 border-zinc-200 hover:bg-zinc-200"
                 }`}>
             {text}
             {active && <X className="w-3 h-3" />}
@@ -110,9 +111,7 @@ export default function BlogPage() {
     // Filtered + sorted (newest first)
     const filtered = useMemo(() => {
         return BLOG_POSTS.filter(
-            (p) =>
-                p.published &&
-                (!activeTag || p.tags.includes(activeTag)),
+            (p) => p.published && (!activeTag || p.tags.includes(activeTag)),
         ).sort(
             (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
         );
@@ -146,10 +145,13 @@ export default function BlogPage() {
                         <Rss className="w-4 h-4" />
                         Personal blog
                     </div>
-                    <h1 className="text-4xl font-bold text-zinc-900 mb-3">Writing</h1>
+                    <h1 className="text-4xl font-bold text-zinc-900 mb-3">
+                        Writing
+                    </h1>
                     <p className="text-zinc-500 text-lg leading-relaxed max-w-xl">
-                        Thoughts on architecture, containers, developer tooling, and building
-                        things that last. No medium paywalls — just plain writing.
+                        Thoughts on architecture, containers, developer tooling,
+                        and building things that last. No medium paywalls — just
+                        plain writing.
                     </p>
                 </motion.div>
 
@@ -181,7 +183,9 @@ export default function BlogPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         className="text-center py-20 text-zinc-400">
-                        <p className="text-lg font-medium">No posts match this tag.</p>
+                        <p className="text-lg font-medium">
+                            No posts match this tag.
+                        </p>
                         <button
                             onClick={() => setActiveTag(null)}
                             className="mt-3 text-sm text-rose-500 hover:underline">
@@ -204,7 +208,8 @@ export default function BlogPage() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 }}
                     className="text-center text-zinc-300 text-xs mt-16">
-                    Full articles coming soon — these are previews of upcoming posts.
+                    Full articles coming soon — these are previews of upcoming
+                    posts.
                 </motion.p>
             </main>
         </div>

@@ -4,7 +4,7 @@
 
 export const OWNER = {
   name: 'Luna Lancuba',
-  title: 'Full Stack Developer | Migrating monoliths to microservices',
+  title: 'Full Stack Developer\nMigrating monoliths to microservices',
   greeting: '👋 Hi, I\'m',
   bio: [
     'Software Engineer specialized in Full Stack and Cloud Architecture.',
@@ -153,27 +153,27 @@ export const BLOG_POSTS = [
 // GUI panel pills → each one fires a real command in the terminal
 export const QUICK_COMMANDS = [
   {
-    emoji: '🚀',
-    label: 'Python Demo',
-    command: 'python3 /home/demo/demo.py',
-    color: 'from-blue-500 to-cyan-500',
-  },
-  {
-    emoji: '⚙️',
-    label: 'Tech Stack',
-    command: 'cat /home/demo/tech-stack.md',
-    color: 'from-purple-500 to-pink-500',
-  },
-  {
-    emoji: '📂',
+    emoji: '�',
     label: 'My Projects',
     command: 'ls projects',
     color: 'from-amber-500 to-orange-500',
   },
   {
+    emoji: '🚀',
+    label: 'Python Demo',
+    command: 'python3 /home/demo/demo.py',
+    color: 'from-rose-500 to-pink-500',
+  },
+  {
+    emoji: '⚙️',
+    label: 'Tech Stack',
+    command: 'cat /home/demo/tech-stack.md',
+    color: 'from-indigo-500 to-violet-500',
+  },
+  {
     emoji: '❓',
     label: 'Help',
     command: 'help',
-    color: 'from-zinc-600 to-zinc-800',
+    color: 'from-green-500 to-emerald-500',
   },
 ];

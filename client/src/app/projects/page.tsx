@@ -3,22 +3,15 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
-import {
-    ArrowLeft,
-    Search,
-    Github,
-    ExternalLink,
-    X,
-    Star,
-} from "lucide-react";
+import { ArrowLeft, Search, Github, ExternalLink, X, Star } from "lucide-react";
 import { PROJECTS, type ProjectStatus } from "../config";
 
 // ── Status badge ──────────────────────────────────────────────────────────────
 const STATUS_STYLES: Record<ProjectStatus, string> = {
     "Production-Ready": "bg-emerald-100 text-emerald-700 border-emerald-200",
-    "In Progress":      "bg-blue-100   text-blue-700   border-blue-200",
-    "Concept":          "bg-amber-100  text-amber-700  border-amber-200",
-    "Archived":         "bg-zinc-100   text-zinc-500   border-zinc-200",
+    "In Progress": "bg-blue-100   text-blue-700   border-blue-200",
+    Concept: "bg-amber-100  text-amber-700  border-amber-200",
+    Archived: "bg-zinc-100   text-zinc-500   border-zinc-200",
 };
 
 function StatusBadge({ status }: { status: ProjectStatus }) {
@@ -44,9 +37,10 @@ function Tag({
         <button
             onClick={onClick}
             className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border transition-all
-                ${active
-                    ? "bg-indigo-600 text-white border-indigo-600 shadow"
-                    : "bg-zinc-100 text-zinc-600 border-zinc-200 hover:bg-zinc-200"
+                ${
+                    active
+                        ? "bg-indigo-600 text-white border-indigo-600 shadow"
+                        : "bg-zinc-100 text-zinc-600 border-zinc-200 hover:bg-zinc-200"
                 }`}>
             {text}
             {active && <X className="w-3 h-3" />}
@@ -142,11 +136,11 @@ function ProjectCard({
 
 // ── Category colour dot ───────────────────────────────────────────────────────
 const CATEGORY_COLORS: Record<string, string> = {
-    Web:     "bg-cyan-500",
+    Web: "bg-cyan-500",
     Backend: "bg-emerald-500",
-    DevOps:  "bg-amber-500",
-    Mobile:  "bg-violet-500",
-    Other:   "bg-zinc-400",
+    DevOps: "bg-amber-500",
+    Mobile: "bg-violet-500",
+    Other: "bg-zinc-400",
 };
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -211,10 +205,13 @@ export default function ProjectsPage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4 }}
                     className="mb-10">
-                    <h1 className="text-4xl font-bold text-zinc-900 mb-3">Projects</h1>
+                    <h1 className="text-4xl font-bold text-zinc-900 mb-3">
+                        Projects
+                    </h1>
                     <p className="text-zinc-500 text-lg max-w-xl leading-relaxed">
-                        Things I&apos;ve built, explored, or am currently working on.
-                        Grouped by category — search by name, tech, or tag.
+                        Things I&apos;ve built, explored, or am currently
+                        working on. Grouped by category — search by name, tech,
+                        or tag.
                     </p>
                 </motion.div>
 
@@ -269,40 +266,51 @@ export default function ProjectsPage() {
                         animate={{ opacity: 1 }}
                         className="text-center py-20 text-zinc-400">
                         <Search className="w-10 h-10 mx-auto mb-4 opacity-30" />
-                        <p className="text-lg font-medium">No projects match your search.</p>
+                        <p className="text-lg font-medium">
+                            No projects match your search.
+                        </p>
                         <button
-                            onClick={() => { setQuery(""); setActiveTag(null); }}
+                            onClick={() => {
+                                setQuery("");
+                                setActiveTag(null);
+                            }}
                             className="mt-3 text-sm text-indigo-500 hover:underline">
                             Clear filters
                         </button>
                     </motion.div>
                 ) : (
                     <div className="space-y-12">
-                        {Array.from(grouped.entries()).map(([category, projects]) => (
-                            <section key={category}>
-                                {/* Category heading */}
-                                <div className="flex items-center gap-2 mb-5">
-                                    <span
-                                        className={`w-2.5 h-2.5 rounded-full ${CATEGORY_COLORS[category] ?? "bg-zinc-400"}`}
-                                    />
-                                    <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-widest">
-                                        {category}
-                                    </h2>
-                                    <span className="text-xs text-zinc-300">
-                                        · {projects.length}
-                                    </span>
-                                </div>
-
-                                {/* Grid */}
-                                <AnimatePresence mode="popLayout">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                        {projects.map((p, i) => (
-                                            <ProjectCard key={p.id} project={p} index={i} />
-                                        ))}
+                        {Array.from(grouped.entries()).map(
+                            ([category, projects]) => (
+                                <section key={category}>
+                                    {/* Category heading */}
+                                    <div className="flex items-center gap-2 mb-5">
+                                        <span
+                                            className={`w-2.5 h-2.5 rounded-full ${CATEGORY_COLORS[category] ?? "bg-zinc-400"}`}
+                                        />
+                                        <h2 className="text-sm font-semibold text-zinc-500 uppercase tracking-widest">
+                                            {category}
+                                        </h2>
+                                        <span className="text-xs text-zinc-300">
+                                            · {projects.length}
+                                        </span>
                                     </div>
-                                </AnimatePresence>
-                            </section>
-                        ))}
+
+                                    {/* Grid */}
+                                    <AnimatePresence mode="popLayout">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                            {projects.map((p, i) => (
+                                                <ProjectCard
+                                                    key={p.id}
+                                                    project={p}
+                                                    index={i}
+                                                />
+                                            ))}
+                                        </div>
+                                    </AnimatePresence>
+                                </section>
+                            ),
+                        )}
                     </div>
                 )}
             </main>
