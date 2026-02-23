@@ -19,7 +19,9 @@ export default function Home() {
     };
 
     return (
-        <div className="h-screen w-screen overflow-hidden" style={{ backgroundColor: '#f6f6f7' }}>
+        <div
+            className="h-screen w-screen overflow-hidden"
+            style={{ backgroundColor: "#f6f6f7" }}>
             {/* ── Desktop: split screen ── */}
             <div className="hidden lg:grid lg:grid-cols-[1.2fr_2px_1fr] h-full">
                 {/* Left — GUI */}
@@ -31,7 +33,9 @@ export default function Home() {
                 <div className="bg-zinc-300 self-stretch my-8 rounded-full" />
 
                 {/* Right — Terminal */}
-                <div className="p-6 flex items-stretch" style={{ backgroundColor: '#f6f6f7' }}>
+                <div
+                    className="p-6 flex items-stretch"
+                    style={{ backgroundColor: "#f6f6f7" }}>
                     <div className="w-full">
                         <RootResumeTerminal
                             command={currentCommand}

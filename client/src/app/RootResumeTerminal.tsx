@@ -81,16 +81,30 @@ export default function RootResumeTerminal({
     const terminalEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // Inject command from GUI buttons
+    // Inject command from GUI buttons — typewriter effect
     useEffect(() => {
-        if (injectedCommand && sessionId && !isInitializing) {
-            setInput(injectedCommand);
+        if (!injectedCommand || !sessionId || isInitializing) return;
+
+        setInput("");
+        const timeouts: ReturnType<typeof setTimeout>[] = [];
+
+        // Type each character at 30ms intervals
+        [...injectedCommand].forEach((char, i) => {
             const t = setTimeout(() => {
-                handleSubmitCommand(injectedCommand);
-                onCommandExecuted?.();
-            }, 150);
-            return () => clearTimeout(t);
-        }
+                setInput((prev) => prev + char);
+            }, i * 30);
+            timeouts.push(t);
+        });
+
+        // Submit after all chars are typed + short pause
+        const submitDelay = injectedCommand.length * 30 + 150;
+        const submitT = setTimeout(() => {
+            handleSubmitCommand(injectedCommand);
+            onCommandExecuted?.();
+        }, submitDelay);
+        timeouts.push(submitT);
+
+        return () => timeouts.forEach(clearTimeout);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [injectedCommand, sessionId, isInitializing]);
 
