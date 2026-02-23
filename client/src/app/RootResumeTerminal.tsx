@@ -698,14 +698,14 @@ export default function RootResumeTerminal({
                 onClose={handleEditorClose}
             />
             <div
-                className="relative flex h-[80vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-zinc-800 bg-black shadow-2xl"
+                className="relative flex h-[80vh] w-full min-w-0 flex-col overflow-hidden rounded-lg border border-zinc-800 bg-black shadow-2xl"
                 onClick={handleTerminalClick}>
                 <div className="flex items-center justify-center border-b border-zinc-800 bg-gray-800 px-4 py-2">
                     <div className="text-zinc-400 text-sm font-bold">
                         {username}@RootResume: {cwd}
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
                     {isInitializing && (
                         <div className="animate-pulse text-green-500">
                             Booting RootResume OS...
@@ -741,7 +741,7 @@ export default function RootResumeTerminal({
                             )}
                         </div>
                     ))}
-                    {!isInitializing && (
+                    {!isInitializing && !isLoading && (
                         <form
                             onSubmit={handleSubmit}
                             className="flex items-center">
