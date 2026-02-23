@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Linkedin, Mail, FileDown, BookOpen } from "lucide-react";
+import { Github, Linkedin, Mail, FileDown, BookOpen, FolderGit2, Newspaper } from "lucide-react";
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -97,6 +97,30 @@ export function PresentationPanel() {
                         className="group relative px-5 py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-sm font-medium shadow-lg hover:shadow-xl transition-all overflow-hidden flex items-center gap-2">
                         <BookOpen className="w-4 h-4" />
                         <span>About this portfolio</span>
+                        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+                    </Link>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}>
+                    <Link
+                        href="/projects"
+                        className="group relative px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-medium shadow-lg hover:shadow-xl transition-all overflow-hidden flex items-center gap-2">
+                        <FolderGit2 className="w-4 h-4" />
+                        <span>Projects</span>
+                        <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+                    </Link>
+                </motion.div>
+
+                <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}>
+                    <Link
+                        href="/blog"
+                        className="group relative px-5 py-2.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-sm font-medium shadow-lg hover:shadow-xl transition-all overflow-hidden flex items-center gap-2">
+                        <Newspaper className="w-4 h-4" />
+                        <span>Blog</span>
                         <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
                     </Link>
                 </motion.div>
