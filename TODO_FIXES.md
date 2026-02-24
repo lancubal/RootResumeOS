@@ -18,12 +18,11 @@
 ~~18. Los comandos de visualize pathfinder y dfs podrian ser apenitas mas rapidos~~ [done] pathfinder DELAY 100000→55000µs, dfs DELAY 150000→55000µs.
 ~~19. El comando de visualize life podria ser apenas mas lento~~ [done] DELAY 0.12→0.20s.
 ~~20. Mandebrot podria tener mas frames~~ [done] STEPS ampliado de 10 a 16 frames, sleep entre frames 0.3→0.25s.
-21. montecarlo no da el resultado aproximado de pi al finalizar
-22. Se podran agregar colores a los comandos de visualize?
-23. En help, sacarle el emoji de ojitos al comando matrix y ponerle algo mejor.
-24. Probar las challenges
-25. En help, cambiar la descripcion del comando challenge.
-26. Cuando se ejecuta el comando challenge, mostrar una descripcion que diga que para iniciar una challenge usar el comando "start" y el numero de challenge
+~~21. montecarlo no da el resultado aproximado de pi al finalizar~~ [done] Bloque final usa ASCII (===, pi ~) y agrega sleep(0.5) tras el flush para que el SSE llegue antes del close.
+~~22. Se podran agregar colores a los comandos de visualize?~~ [done] Los frames de streaming usan type:'logo' → color emerald-500.
+~~23. En help, sacarle el emoji de ojitos al comando matrix y ponerle algo mejor.~~ [done] Descripción cambiada a "Wake up, Neo...".
+~~25. En help, cambiar la descripcion del comando challenge.~~ [done] Línea simplificada a "List coding challenges" (sin "(then: start <n>)").
+~~26. Cuando se ejecuta el comando challenge, mostrar una descripcion que diga que para iniciar una challenge usar el comando "start" y el numero de challenge~~ [done] El handler ya mostraba el mensaje de instrucción al listar.
 27. El comando python no hace nada
 28. Para comandos compuestos, por ejemplo visualize. Si no se agregan los argumentos esperados da error de command not found. Para estos casos explicar como se usan el comando ejecutado y dar ejemplos
 29. Darle mas onda al layout mobile.
@@ -35,5 +34,7 @@
 35. Modo noche (automatico quiza?)
 36. Creo que se rompio el numero de visitas
 37. Sumar y ordenar proyectos en Projects y "My Projects"
+
+24. Probar las challenges
 
 1000. Despliegue en AWS

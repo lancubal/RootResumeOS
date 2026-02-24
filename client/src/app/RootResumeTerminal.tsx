@@ -533,8 +533,8 @@ export default function RootResumeTerminal({
                 "  visualize <id> - Run algo demo:",
                 "    C:      bubble, selection, quick, pathfinder, dfs",
                 "    Python: life, mandelbrot, montecarlo, maze",
-                "  matrix         - 🌧️  Green raining symbols",
-                "  challenge      - List coding challenges (then: start <n>)",
+                "  matrix         - Wake up, Neo...",
+                "  challenge      - List coding challenges",
                 "  command &      - Run a command in the background",
                 "  -- System --",
                 "  about          - View system architecture",
@@ -542,7 +542,7 @@ export default function RootResumeTerminal({
                 "  help           - Show this help message",
                 "  ?              - Show keyboard shortcuts",
                 "  clear          - Clear terminal  (or Ctrl+L)",
-                "  [linux]        - Run real commands (ls, python, etc.)",
+                "  [linux]        - Run real commands (ls, cat, gcc, etc.)",
             ];
             helpLines.forEach((l) => pushToHistory(l));
             setIsLoading(false);
