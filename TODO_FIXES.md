@@ -8,8 +8,8 @@
 ~~8. Mejorar el mailto. Contact form — Replace email link with an inline animated form in PresentationPanel that POSTs to a serverless function~~ [done] Formulario inline animado con Resend en /api/contact. El icono de mail toggle el form; muestra estado sending/sent/error.
 ~~9. Agregar link a CV https://drive.google.com/file/d/1kYkX-PsFY6e3MBcFPWdU6oSWz8t_kd46/view?usp=sharing~~ [done] Actualizado en config.ts.
 ~~10. El logo del boton "My Projects" esta roto~~ [done] Emoji corrupto reemplazado por 📁.
-11. Sumar y ordenar proyectos en Projects y "My Projects"
-12. Mejorar "Python Demo" con algo mas visual
+
+~~12. Mejorar "Python Demo" con algo mas visual~~ [done] Reescrita demo.py: header box-drawing, bubble sort con barras antes/después, sieve de Eratóstenes en grilla, triángulo de Sierpiński (Pascal mod 2), Fibonacci con barras proporcionales.
 13. Cambiar el boton de tech stack por algo mejor o definir mejor que muestra.
 14. Skills: Cambiarlo por
     • Languages: Java, Javascript, Typescript, Python, Ruby
@@ -40,5 +40,6 @@
 34. El comando matrix, se acumulan caracteres en la ultima linea y un poco salta el scroll en la terminal mientras ejecuta. Se podria mejorar
 35. Modo noche (automatico quiza?)
 36. Creo que se rompio el numero de visitas
+37. Sumar y ordenar proyectos en Projects y "My Projects"
 
 1000. Despliegue en AWS

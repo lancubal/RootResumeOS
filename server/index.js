@@ -82,6 +82,17 @@ app.post('/challenge/verify', async (req, res) => {
     }
 });
 
+// --- SESSION VALIDATION ---
+// Used by the frontend to check if a stored session is still alive before restoring it.
+app.get('/session/:id', (req, res) => {
+    const { id } = req.params;
+    if (sessionManager.sessions.has(id)) {
+        res.json({ valid: true });
+    } else {
+        res.status(404).json({ valid: false });
+    }
+});
+
 // --- STREAMING ENDPOINTS ---
 
 app.get('/stream', async (req, res) => {

@@ -213,15 +213,35 @@ export default function RootResumeTerminal({
     useEffect(() => {
         const initSession = async () => {
             try {
-                // Reuse existing session if available (survives page navigation)
-                const storedSid = sessionStorage.getItem("rootresume_sid");
-                const storedHistory =
-                    sessionStorage.getItem("rootresume_history");
-                if (storedSid && storedHistory) {
-                    setSessionId(storedSid);
-                    setHistory(JSON.parse(storedHistory));
-                    setIsInitializing(false);
-                    return;
+                // Session persistence can be disabled via env var (useful during development)
+                const persistSession =
+                    process.env.NEXT_PUBLIC_PERSIST_SESSION !== "false";
+
+                if (persistSession) {
+                    const storedSid = sessionStorage.getItem("rootresume_sid");
+                    const storedHistory =
+                        sessionStorage.getItem("rootresume_history");
+                    if (storedSid && storedHistory) {
+                        // Validate the session is still alive on the server before
+                        // trusting it. If the server was restarted its in-memory Map
+                        // is empty even though sessionStorage still holds the old ID.
+                        try {
+                            const checkRes = await fetch(
+                                `${API_URL}/session/${storedSid}`,
+                            );
+                            if (checkRes.ok) {
+                                setSessionId(storedSid);
+                                setHistory(JSON.parse(storedHistory));
+                                setIsInitializing(false);
+                                return;
+                            }
+                        } catch {
+                            // Server unreachable — fall through to start fresh
+                        }
+                        // Session no longer valid — clear stale storage
+                        sessionStorage.removeItem("rootresume_sid");
+                        sessionStorage.removeItem("rootresume_history");
+                    }
                 }
 
                 const res = await fetch(`${API_URL}/start`, { method: "POST" });
@@ -937,6 +957,18 @@ export default function RootResumeTerminal({
                         body: JSON.stringify({ sessionId, code: command }),
                     });
                     const data = await response.json();
+                    // Session expired (e.g. server restarted) — clear stale storage
+                    // and reload so a fresh session is created automatically.
+                    if (response.status === 404 && data.error?.includes?.("expired")) {
+                        sessionStorage.removeItem("rootresume_sid");
+                        sessionStorage.removeItem("rootresume_history");
+                        pushToHistory(
+                            "Session expired. Starting a new session...",
+                            "error",
+                        );
+                        setTimeout(() => window.location.reload(), 1500);
+                        return;
+                    }
                     pushToHistory(data.error || data.output || "");
                     if (data.cwd) {
                         setCwd(data.cwd.replace("/home/guest", "~"));

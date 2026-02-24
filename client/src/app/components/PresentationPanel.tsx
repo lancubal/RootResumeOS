@@ -131,9 +131,6 @@ export function PresentationPanel() {
 
                     {/* Name + title */}
                     <div>
-                        <div className="hidden lg:block text-zinc-500 mb-1 text-sm">
-                            {OWNER.greeting}
-                        </div>
                         <motion.h1
                             className="text-3xl lg:text-5xl font-bold mb-1 cursor-default select-none"
                             whileHover="hover">
