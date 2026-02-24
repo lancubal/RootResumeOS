@@ -6,7 +6,7 @@ GitHubActions_ECR_Access arn:aws:iam::841162713852:role/GitHubActions_ECR_Access
 EC2_ECR_ReadOnly arn:aws:iam::841162713852:role/EC2_ECR_ReadOnly
 
 EC2
-98.93.22.101
+18.214.236.45
 
 # Guía de Despliegue en Producción (AWS) - RootResume
 
