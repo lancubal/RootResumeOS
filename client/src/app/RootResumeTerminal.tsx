@@ -619,13 +619,16 @@ export default function RootResumeTerminal({
             const BAR_WIDTH = 12;
             const CATEGORIES = [
                 "Languages",
-                "Backend",
                 "Frontend",
+                "Backend",
                 "DevOps",
+                "Databases",
+                "Spoken",
             ] as const;
-            pushToHistory("─".repeat(44));
-            pushToHistory("  SKILL PROFICIENCY");
-            pushToHistory("─".repeat(44));
+            const SEP = "─".repeat(32);
+            pushToHistory(SEP);
+            pushToHistory("  SKILLS");
+            pushToHistory(SEP);
             CATEGORIES.forEach((cat) => {
                 pushToHistory("");
                 pushToHistory(`  [${cat}]`);
@@ -638,7 +641,7 @@ export default function RootResumeTerminal({
                 });
             });
             pushToHistory("");
-            pushToHistory("─".repeat(44));
+            pushToHistory(SEP);
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
         } else if (command === "matrix") {

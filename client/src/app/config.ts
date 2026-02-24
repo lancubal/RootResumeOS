@@ -269,37 +269,48 @@ export const BLOG_POSTS = [
 ];
 
 // ── Skills — used in the terminal `skills` command and PresentationPanel pills ─
-export type SkillCategory = 'Languages' | 'Backend' | 'Frontend' | 'DevOps';
+export type SkillCategory = 'Languages' | 'Frontend' | 'Backend' | 'DevOps' | 'Databases' | 'Spoken';
 
 export const SKILLS: { name: string; level: number; category: SkillCategory }[] = [
   // Languages
-  { name: 'TypeScript', level: 90, category: 'Languages' },
-  { name: 'Python',     level: 85, category: 'Languages' },
-  { name: 'Java',       level: 75, category: 'Languages' },
-  { name: 'Bash',       level: 82, category: 'Languages' },
-  // Backend
-  { name: 'Node.js',    level: 88, category: 'Backend' },
-  { name: 'Express',    level: 85, category: 'Backend' },
-  { name: 'PostgreSQL', level: 80, category: 'Backend' },
-  { name: 'Redis',      level: 74, category: 'Backend' },
+  { name: 'Java',        level: 85, category: 'Languages' },
+  { name: 'JavaScript',  level: 90, category: 'Languages' },
+  { name: 'TypeScript',  level: 90, category: 'Languages' },
+  { name: 'Python',      level: 85, category: 'Languages' },
+  { name: 'Ruby',        level: 70, category: 'Languages' },
   // Frontend
-  { name: 'React',      level: 88, category: 'Frontend' },
-  { name: 'Next.js',    level: 85, category: 'Frontend' },
-  { name: 'Tailwind',   level: 92, category: 'Frontend' },
+  { name: 'Angular',     level: 80, category: 'Frontend' },
+  { name: 'VueJS/Nuxt',  level: 82, category: 'Frontend' },
+  { name: 'React',       level: 88, category: 'Frontend' },
+  { name: 'Next.js',     level: 85, category: 'Frontend' },
+  { name: 'Svelte',      level: 70, category: 'Frontend' },
+  // Backend
+  { name: 'SpringBoot',  level: 82, category: 'Backend' },
+  { name: 'Django',      level: 78, category: 'Backend' },
+  { name: 'Node.js',     level: 88, category: 'Backend' },
   // DevOps
-  { name: 'Docker',     level: 86, category: 'DevOps' },
-  { name: 'AWS',        level: 76, category: 'DevOps' },
-  { name: 'Nginx',      level: 80, category: 'DevOps' },
-  { name: 'Terraform',  level: 70, category: 'DevOps' },
-  { name: 'Linux',      level: 88, category: 'DevOps' },
+  { name: 'Docker',      level: 86, category: 'DevOps' },
+  { name: 'Kubernetes',  level: 75, category: 'DevOps' },
+  { name: 'Jenkins',     level: 76, category: 'DevOps' },
+  { name: 'Gitlab CI',   level: 80, category: 'DevOps' },
+  { name: 'Playwright',  level: 78, category: 'DevOps' },
+  { name: 'JUnit',       level: 82, category: 'DevOps' },
+  // Databases
+  { name: 'MySQL',       level: 85, category: 'Databases' },
+  { name: 'MongoDB',     level: 78, category: 'Databases' },
+  // Spoken
+  { name: 'Spanish',     level: 100, category: 'Spoken' },
+  { name: 'English C2',  level: 95,  category: 'Spoken' },
 ];
 
 // ── Skill category colors — used by PresentationPanel pills ─────────────────
 export const SKILL_CATEGORY_COLORS: Record<SkillCategory, string> = {
   Languages: 'bg-blue-50 text-blue-700 border-blue-200',
-  Backend:   'bg-emerald-50 text-emerald-700 border-emerald-200',
   Frontend:  'bg-violet-50 text-violet-700 border-violet-200',
+  Backend:   'bg-emerald-50 text-emerald-700 border-emerald-200',
   DevOps:    'bg-amber-50 text-amber-700 border-amber-200',
+  Databases: 'bg-cyan-50 text-cyan-700 border-cyan-200',
+  Spoken:    'bg-rose-50 text-rose-700 border-rose-200',
 };
 
 // GUI panel pills → each one fires a real command in the terminal
@@ -318,8 +329,8 @@ export const QUICK_COMMANDS = [
   },
   {
     emoji: '⚙️',
-    label: 'Tech Stack',
-    command: 'cat /home/demo/tech-stack.md',
+    label: 'Skills',
+    command: 'skills',
     color: 'from-indigo-500 to-violet-500',
   },
   {
