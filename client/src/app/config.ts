@@ -16,7 +16,7 @@ export const OWNER = {
   description:
     'I build scalable architectures and transform legacy systems. ' +
     'You can explore my work through the terminal or use the quick actions below.',
-  cv: 'https://drive.google.com/your-cv-link', // ← replace with your real URL
+  cv: 'https://drive.google.com/file/d/1kYkX-PsFY6e3MBcFPWdU6oSWz8t_kd46/view?usp=sharing',
   social: {
     github:   'https://github.com/lancubal',
     linkedin: 'https://linkedin.com/in/luna-lancuba-6621491b8',
@@ -305,7 +305,7 @@ export const SKILL_CATEGORY_COLORS: Record<SkillCategory, string> = {
 // GUI panel pills → each one fires a real command in the terminal
 export const QUICK_COMMANDS = [
   {
-    emoji: '�',
+    emoji: '📁',
     label: 'My Projects',
     command: 'ls projects',
     color: 'from-amber-500 to-orange-500',
