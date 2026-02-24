@@ -11,32 +11,60 @@ documented, and refined before being considered for `master`.
 
 | Feature | Description | Files |
 |---------|-------------|-------|
-| **Skills pills in panel** | Animated tech pill tags below the description in PresentationPanel | `PresentationPanel.tsx`, `config.ts` |
 | **`skills` terminal command** | ASCII horizontal bar chart of skill levels, rendered inline in the terminal | `RootResumeTerminal.tsx`, `config.ts` |
-| **`matrix` easter egg** | Hidden `matrix` command that spawns a green digital rain animation in the terminal | `RootResumeTerminal.tsx` |
+| **`matrix` easter egg** | Hidden `matrix` command that spawns a green digital rain animation in the terminal (crash fixed: bounds guards added) | `RootResumeTerminal.tsx` |
+| **`fortune` command** | Prints a random dev quote in an ASCII box — 18 quotes from `config.ts` | `RootResumeTerminal.tsx`, `config.ts` |
+| **`konami` command + easter egg** | Type `konami` in terminal OR press ↑↑↓↓←→←→BA anywhere on the page | `RootResumeTerminal.tsx`, `page.tsx` |
+| **Avatar hover animation** | Spring-physics scale + tilt on the profile photo, zinc ring on hover | `PresentationPanel.tsx` |
+| **Name hover animation** | Per-character wave with stagger + subtle indigo color shift on the name heading | `PresentationPanel.tsx` |
+| **`/uses` page** | Static page listing editor, terminal, hardware, services and fonts used — linked from panel footer | `app/uses/page.tsx`, `config.ts` |
 | **`/blog/[slug]` pages** | Full article content for each blog post — no more "coming soon" placeholder | `app/blog/[slug]/page.tsx`, `config.ts` |
 | **Blog cards link to articles** | PostCard on `/blog` now navigates to the individual article page | `app/blog/page.tsx` |
-| **SEO metadata** | Proper `metadata` export on `/`, `/projects`, `/blog`, `/about` | all page files |
+| **SEO metadata** | Proper `metadata` export on `/`, `/projects`, `/blog`, `/about`, `/uses` | all page files |
 
 ---
 
 ## 🛠️ Feature Notes
 
-### Skills pills in panel
-- Added a `SKILLS` array to `config.ts` grouping technologies by category (Languages, Backend, Frontend, DevOps)
-- PresentationPanel renders them as small animated pills between the description and the nav buttons
-- Pills use a subtle stagger animation on load
+### Skills pills in panel *(removed — too noisy)*
+- Removed from PresentationPanel in a later iteration; the `skills` terminal command remains
 
 ### `skills` command
 - Purely client-side, no container exec needed
 - Renders an ASCII horizontal bar chart (e.g. `█████████░  90% TypeScript`)
 - Data comes from `SKILLS` in `config.ts` — easy to update
 
-### `matrix` easter egg
+### `matrix` easter egg (crash fixed)
+- Bounds guards added: `row - 1 < ROWS` and `row - 3 < ROWS` prevent out-of-bounds grid access
+  that caused `grid[(row-1)] is undefined` when drop values exceeded grid height
 - Type `matrix` in the terminal
 - Spawns a character rain using random katakana + latin mixed characters
 - Rendered frame-by-frame as terminal output updates (like the viz engine but client-side)
 - Auto-stops after ~5 seconds or on `Ctrl+C`
+
+### `fortune` command
+- Picks a random quote from `FORTUNE_QUOTES` (18 dev/hacker quotes in `config.ts`)
+- Wraps long text to 56 characters and renders it in a `+───+` ASCII box
+- Author appears on the last line right-aligned inside the box
+
+### Konami easter egg
+- Type `konami` in the terminal → ASCII "DUFELL" banner with the cheat code string
+- OR press ↑↑↓↓←→←→BA anywhere on the page → same effect via global `keydown` listener in `page.tsx`
+- Uses a rolling buffer of the last 10 keys; resets automatically on mismatch
+
+### Hover animations
+- **Avatar**: `motion.div` with `whileHover={{ scale: 1.07, rotate: 4 }}` + spring physics; inner div gets a zinc ring + shadow on hover
+- **Name heading**: `<motion.h1 whileHover="hover">` — each character is a `motion.span` with a `hover` variant that lifts it `y: -6` and shifts color through an indigo gradient, staggered by index × 30ms
+
+### `/uses` page
+- Accessible at `/uses` and linked with a subtle `/uses` text in the panel footer
+- Server component, static — no client JS needed
+- Data lives in `USES` array in `config.ts` (5 categories: Editor & IDE, Terminal, Services & DevOps, Hardware, Fonts & Design)
+- Inspired by uses.tech
+
+---
+
+## 🔬 Ideas Pending (not yet built)
 
 ### `/blog/[slug]` pages
 - Each post in `BLOG_POSTS` now has a `content` field (plain sections with headings + paragraphs)
@@ -90,6 +118,7 @@ client/src/app/
   projects/page.tsx
   blog/page.tsx
   blog/[slug]/page.tsx   ← NEW (this branch)
+  uses/page.tsx          ← NEW (this branch)
 
 server/
   index.js               ← Express + SSE + Docker socket
@@ -105,3 +134,4 @@ server/
 |------|---------------|
 | 2026-02-23 | Branch created from master after layout restructure commit |
 | 2026-02-23 | Skills pills, `skills` command, `matrix` easter egg, blog post pages, SEO metadata |
+| 2026-02-23 | Removed skills pills (too noisy); fixed matrix crash; hover animations on avatar + name; `fortune` + `konami` commands; Konami code easter egg; `/uses` page |
