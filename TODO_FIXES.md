@@ -10,15 +10,9 @@
 ~~10. El logo del boton "My Projects" esta roto~~ [done] Emoji corrupto reemplazado por 📁.
 
 ~~12. Mejorar "Python Demo" con algo mas visual~~ [done] Reescrita demo.py: header box-drawing, bubble sort con barras antes/después, sieve de Eratóstenes en grilla, triángulo de Sierpiński (Pascal mod 2), Fibonacci con barras proporcionales.
-13. Cambiar el boton de tech stack por algo mejor o definir mejor que muestra.
-14. Skills: Cambiarlo por
-    • Languages: Java, Javascript, Typescript, Python, Ruby
-    • Frontend: Angular, VueJS (Vite/Nuxt), React, NextJs, Svelte
-    • Backend: Java Spring Boot, Django, NodeJS
-    • DevOps & Tools: Docker, Kubernetes, Jenkins, Gitlab CI, Playwright, JUnit
-    • Databases: MySQL, MongoDB
-    • Spoken Languages: Spanish (Native), English (C2 Proficiency)
-15. Tambien los separadoresde skills son demasiado anchos
+~~13. Cambiar el boton de tech stack por algo mejor o definir mejor que muestra.~~ [done] Botón renombrado a "Skills", ejecuta el comando `skills`.
+~~14. Skills: Cambiarlo por nuevas categorías.~~ [done] SKILLS reemplazado: Languages (Java/JS/TS/Python/Ruby), Frontend (Angular/Vue/React/Next/Svelte), Backend (SpringBoot/Django/Node), DevOps (Docker/K8s/Jenkins/GitlabCI/Playwright/JUnit), Databases (MySQL/MongoDB), Spoken (Spanish/English C2). `SkillCategory` y `SKILL_CATEGORY_COLORS` actualizados.
+~~15. Tambien los separadoresde skills son demasiado anchos~~ [done] Separadores de `skills` reducidos de 44 → 32 chars.
 16. Agregar mas quotes al comando fortune o buscar una api libre para consultar
 17. Para los comandos de visualize, los de C tienen dos descripciones. Quedarse con la azul.
 18. Los comandos de visualize pathfinder y dfs podrian ser apenitas mas rapidos
