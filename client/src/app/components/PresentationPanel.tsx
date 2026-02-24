@@ -71,7 +71,7 @@ export function PresentationPanel() {
     ];
 
     return (
-        <div className="h-full flex flex-col px-6 lg:px-12 py-4 lg:py-12">
+        <div className="h-full flex flex-col px-6 lg:px-12 pt-4 lg:pt-12 pb-4">
             {/* Mobile-only header strip */}
             <div className="lg:hidden flex items-center justify-between mb-5 pb-5 border-b border-zinc-100">
                 <Link

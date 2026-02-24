@@ -72,7 +72,7 @@ export default function Home() {
 
                 {/* Right — Terminal + Quick Actions */}
                 <div
-                    className="flex flex-col p-4 lg:pb-12 gap-3 min-h-0 overflow-hidden"
+                    className="flex flex-col p-4 gap-3 min-h-0 overflow-hidden"
                     style={{ backgroundColor: "#f6f6f7" }}>
                     {/* Terminal — fills remaining height */}
                     <div className="flex-1 min-h-0">
