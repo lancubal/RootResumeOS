@@ -213,12 +213,21 @@ export default function RootResumeTerminal({
     useEffect(() => {
         const initSession = async () => {
             try {
+                // Reuse existing session if available (survives page navigation)
+                const storedSid = sessionStorage.getItem("rootresume_sid");
+                const storedHistory = sessionStorage.getItem("rootresume_history");
+                if (storedSid && storedHistory) {
+                    setSessionId(storedSid);
+                    setHistory(JSON.parse(storedHistory));
+                    setIsInitializing(false);
+                    return;
+                }
+
                 const res = await fetch(`${API_URL}/start`, { method: "POST" });
                 const data = await res.json();
 
                 if (data.sessionId) {
-                    setSessionId(data.sessionId);
-                    setHistory([
+                    const initialHistory: HistoryItem[] = [
                         {
                             text: "Welcome to RootResume OS v1.0",
                             type: "header",
@@ -241,7 +250,11 @@ export default function RootResumeTerminal({
                             type: "output",
                         },
                         { text: "", type: "output" },
-                    ]);
+                    ];
+                    sessionStorage.setItem("rootresume_sid", data.sessionId);
+                    sessionStorage.setItem("rootresume_history", JSON.stringify(initialHistory));
+                    setSessionId(data.sessionId);
+                    setHistory(initialHistory);
                 } else {
                     setHistory([
                         {
@@ -264,6 +277,16 @@ export default function RootResumeTerminal({
 
         initSession();
     }, []);
+
+    // Persist history to sessionStorage on every change (cap at 300 items)
+    useEffect(() => {
+        if (sessionId && history.length > 0) {
+            sessionStorage.setItem(
+                "rootresume_history",
+                JSON.stringify(history.slice(-300)),
+            );
+        }
+    }, [history, sessionId]);
 
     // --- EDITOR HANDLERS ---
     const handleEditorSave = async (content: string) => {
