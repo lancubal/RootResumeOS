@@ -556,7 +556,7 @@ export default function RootResumeTerminal({
                 FORTUNE_QUOTES[
                     Math.floor(Math.random() * FORTUNE_QUOTES.length)
                 ];
-            const W = 56;
+            const W = 40;
             const bar = "+" + "-".repeat(W + 2) + "+";
             const wrap = (text: string, w: number): string[] => {
                 const words = text.split(" ");
@@ -827,7 +827,15 @@ export default function RootResumeTerminal({
         } else {
             // --- Streaming Commands ---
             if (command === "visualize") {
-                const vizList = ["quicksort", "pathfinder", "dfs", "life", "mandelbrot", "montecarlo", "maze"];
+                const vizList = [
+                    "quicksort",
+                    "pathfinder",
+                    "dfs",
+                    "life",
+                    "mandelbrot",
+                    "montecarlo",
+                    "maze",
+                ];
                 pushToHistory("");
                 pushToHistory("Usage:  visualize <id>");
                 pushToHistory("");
@@ -844,7 +852,10 @@ export default function RootResumeTerminal({
                     const response = await fetch(`${API_URL}/exec`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ sessionId, code: "python3 /home/demo/demo.py" }),
+                        body: JSON.stringify({
+                            sessionId,
+                            code: "python3 /home/demo/demo.py",
+                        }),
                     });
                     const data = await response.json();
                     pushToHistory(data.error || data.output || "");
@@ -981,7 +992,10 @@ export default function RootResumeTerminal({
                     const data = await response.json();
                     // Session expired (e.g. server restarted) — clear stale storage
                     // and reload so a fresh session is created automatically.
-                    if (response.status === 404 && data.error?.includes?.("expired")) {
+                    if (
+                        response.status === 404 &&
+                        data.error?.includes?.("expired")
+                    ) {
                         sessionStorage.removeItem("rootresume_sid");
                         sessionStorage.removeItem("rootresume_history");
                         pushToHistory(

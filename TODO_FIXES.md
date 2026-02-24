@@ -13,8 +13,8 @@
 ~~13. Cambiar el boton de tech stack por algo mejor o definir mejor que muestra.~~ [done] Botón renombrado a "Skills", ejecuta el comando `skills`.
 ~~14. Skills: Cambiarlo por nuevas categorías.~~ [done] SKILLS reemplazado: Languages (Java/JS/TS/Python/Ruby), Frontend (Angular/Vue/React/Next/Svelte), Backend (SpringBoot/Django/Node), DevOps (Docker/K8s/Jenkins/GitlabCI/Playwright/JUnit), Databases (MySQL/MongoDB), Spoken (Spanish/English C2). `SkillCategory` y `SKILL_CATEGORY_COLORS` actualizados.
 ~~15. Tambien los separadoresde skills son demasiado anchos~~ [done] Separadores de `skills` reducidos de 44 → 32 chars.
-16. Agregar mas quotes al comando fortune o buscar una api libre para consultar
-17. Para los comandos de visualize, los de C tienen dos descripciones. Quedarse con la azul.
+~~16. Agregar mas quotes al comando fortune o buscar una api libre para consultar~~ [done] FORTUNE_QUOTES ampliado de 18 a 37 quotes. Marco de la caja reducido de W=56 a W=40.
+~~17. Para los comandos de visualize, los de C tienen dos descripciones. Quedarse con la azul.~~ [done] Removidas las líneas `puts("Description:...")` del código C generado; separador interno reducido de 75 a 32 dashes.
 18. Los comandos de visualize pathfinder y dfs podrian ser apenitas mas rapidos
 19. El comando de visualize life podria ser apenas mas lento
 20. Mandebrot podria tener mas frames
