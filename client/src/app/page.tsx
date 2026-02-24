@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Terminal as TerminalIcon, X, Github, Linkedin, Mail } from "lucide-react";
+import {
+    Terminal as TerminalIcon,
+    X,
+    Github,
+    Linkedin,
+    Mail,
+} from "lucide-react";
 import { QUICK_COMMANDS, OWNER } from "./config";
 import { motion, AnimatePresence } from "motion/react";
 import { PresentationPanel } from "./components/PresentationPanel";
@@ -110,17 +116,29 @@ export default function Home() {
                 </div>
 
                 {/* Fixed bottom bar: social icons (left) + terminal button (right) */}
-                <div className="fixed bottom-0 inset-x-0 h-20 flex items-center justify-between px-6 z-40 lg:hidden" style={{ backgroundColor: "#f6f6f7" }}>
+                <div
+                    className="fixed bottom-0 inset-x-0 h-20 flex items-center justify-between px-6 z-40 lg:hidden"
+                    style={{ backgroundColor: "#f6f6f7" }}>
                     <div className="flex items-center gap-5">
-                        <a href={OWNER.social.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"
+                        <a
+                            href={OWNER.social.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="GitHub"
                             className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
                             <Github className="w-5 h-5 text-zinc-600" />
                         </a>
-                        <a href={OWNER.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
+                        <a
+                            href={OWNER.social.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="LinkedIn"
                             className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
                             <Linkedin className="w-5 h-5 text-zinc-600" />
                         </a>
-                        <a href={`mailto:${OWNER.social.email}`} aria-label="Email"
+                        <a
+                            href={`mailto:${OWNER.social.email}`}
+                            aria-label="Email"
                             className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
                             <Mail className="w-5 h-5 text-zinc-600" />
                         </a>

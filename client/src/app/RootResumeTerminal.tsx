@@ -215,7 +215,8 @@ export default function RootResumeTerminal({
             try {
                 // Reuse existing session if available (survives page navigation)
                 const storedSid = sessionStorage.getItem("rootresume_sid");
-                const storedHistory = sessionStorage.getItem("rootresume_history");
+                const storedHistory =
+                    sessionStorage.getItem("rootresume_history");
                 if (storedSid && storedHistory) {
                     setSessionId(storedSid);
                     setHistory(JSON.parse(storedHistory));
@@ -252,7 +253,10 @@ export default function RootResumeTerminal({
                         { text: "", type: "output" },
                     ];
                     sessionStorage.setItem("rootresume_sid", data.sessionId);
-                    sessionStorage.setItem("rootresume_history", JSON.stringify(initialHistory));
+                    sessionStorage.setItem(
+                        "rootresume_history",
+                        JSON.stringify(initialHistory),
+                    );
                     setSessionId(data.sessionId);
                     setHistory(initialHistory);
                 } else {

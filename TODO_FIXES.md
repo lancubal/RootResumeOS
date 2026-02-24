@@ -3,9 +3,9 @@
 ~~3. La primera linea separadora que aparece en la terminal es demasiado larga~~ [done] Reducida a 32 caracteres unicode.
 ~~4. En mobile la foto y los titulos no entran en el ancho. Pasar la foto arriba y al centro de los titulos y acomodar los titulos para que entren.~~ [done] Header strip mobile con /uses + Download CV; footer fijo con social icons + boton terminal; layout columna centrada; foto agrandada.
 5. Agregar al comando "challenge" una explicacion de que el usuario tiene que hacer start y el numero de challenge que quiere hacer.
-6. Cuando voy a una de las otras paginas y vuelvo. Se esta matando el contenedor de terminal e iniciando uno nuevo?
-7. Modificar el link a linkedin luna-lancuba-6621491b8
-8. Mejorar el mailto. Contact form — Replace email link with an inline animated form in PresentationPanel that POSTs to a serverless function
+~~6. Cuando voy a una de las otras paginas y vuelvo. Se esta matando el contenedor de terminal e iniciando uno nuevo?~~ [done] sessionId e historial se persisten en sessionStorage; al volver a la pagina se reutiliza el contenedor existente sin reiniciar.
+~~7. Modificar el link a linkedin luna-lancuba-6621491b8~~ [done] Actualizado en config.ts.
+~~8. Mejorar el mailto. Contact form — Replace email link with an inline animated form in PresentationPanel that POSTs to a serverless function~~ [done] Formulario inline animado con Resend en /api/contact. El icono de mail toggle el form; muestra estado sending/sent/error.
 9. Agregar link a CV https://drive.google.com/file/d/1kYkX-PsFY6e3MBcFPWdU6oSWz8t_kd46/view?usp=sharing
 10. El logo del boton "My Projects" esta roto
 11. Sumar y ordenar proyectos en Projects y "My Projects"
@@ -38,3 +38,7 @@
 32. Cuando se ejectuta el comando top, mostrar una sugerencia de como ejecutar un proceso en paralelo para probar el uso del sistema
 33. Quiza tener dos opciones para ver los proyectos sea redundante.
 34. El comando matrix, se acumulan caracteres en la ultima linea y un poco salta el scroll en la terminal mientras ejecuta. Se podria mejorar
+35. Modo noche (automatico quiza?)
+36. Creo que se rompio el numero de visitas
+
+1000. Despliegue en AWS

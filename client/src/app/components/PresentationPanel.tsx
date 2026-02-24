@@ -9,14 +9,24 @@ import {
     BookOpen,
     FolderGit2,
     Newspaper,
+    Send,
+    X,
+    CheckCircle,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { OWNER } from "../config";
 
+type ContactStatus = "idle" | "sending" | "sent" | "error";
+
 export function PresentationPanel() {
     const [visitors, setVisitors] = useState<number | null>(null);
+    const [isContactOpen, setIsContactOpen] = useState(false);
+    const [contactName, setContactName] = useState("");
+    const [contactEmail, setContactEmail] = useState("");
+    const [contactMessage, setContactMessage] = useState("");
+    const [contactStatus, setContactStatus] = useState<ContactStatus>("idle");
 
     useEffect(() => {
         fetch("/api/visitors")
@@ -25,10 +35,39 @@ export function PresentationPanel() {
             .catch(() => {});
     }, []);
 
+    const handleContactSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setContactStatus("sending");
+        try {
+            const res = await fetch("/api/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: contactName,
+                    email: contactEmail,
+                    message: contactMessage,
+                }),
+            });
+            if (res.ok) {
+                setContactStatus("sent");
+                setContactName("");
+                setContactEmail("");
+                setContactMessage("");
+                setTimeout(() => {
+                    setIsContactOpen(false);
+                    setContactStatus("idle");
+                }, 2500);
+            } else {
+                setContactStatus("error");
+            }
+        } catch {
+            setContactStatus("error");
+        }
+    };
+
     const socialLinks = [
         { icon: Github, href: OWNER.social.github, label: "GitHub" },
         { icon: Linkedin, href: OWNER.social.linkedin, label: "LinkedIn" },
-        { icon: Mail, href: `mailto:${OWNER.social.email}`, label: "Email" },
     ];
 
     return (
@@ -150,10 +189,13 @@ export function PresentationPanel() {
                     transition={{ duration: 0.6, delay: 0.2 }}
                     className="text-zinc-600 mb-5 max-w-xl leading-relaxed text-sm lg:text-base">
                     <span className="lg:hidden">
-                        I build scalable architectures and transform legacy systems.
-                        Tap the terminal button below to explore my work.
+                        I build scalable architectures and transform legacy
+                        systems. Tap the terminal button below to explore my
+                        work.
                     </span>
-                    <span className="hidden lg:inline">{OWNER.description}</span>
+                    <span className="hidden lg:inline">
+                        {OWNER.description}
+                    </span>
                 </motion.p>
 
                 {/* Row — Explore (right below description) */}
@@ -222,6 +264,18 @@ export function PresentationPanel() {
                         </a>
                     ))}
 
+                    {/* Mail — inline contact form toggle */}
+                    <button
+                        onClick={() => setIsContactOpen((v) => !v)}
+                        aria-label="Contact"
+                        className="w-10 h-10 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
+                        {isContactOpen ? (
+                            <X className="w-5 h-5 text-zinc-600" />
+                        ) : (
+                            <Mail className="w-5 h-5 text-zinc-600" />
+                        )}
+                    </button>
+
                     <div className="w-px h-6 bg-zinc-200" />
 
                     <motion.a
@@ -249,6 +303,94 @@ export function PresentationPanel() {
                         </span>
                     )}
                 </div>
+
+                {/* Inline contact form */}
+                <AnimatePresence>
+                    {isContactOpen && (
+                        <motion.form
+                            onSubmit={handleContactSubmit}
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                            className="overflow-hidden mt-4">
+                            <div className="flex flex-col gap-2 p-4 rounded-xl bg-zinc-50 border border-zinc-200">
+                                {contactStatus === "sent" ? (
+                                    <motion.div
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="flex items-center gap-2 text-green-600 py-2 justify-center">
+                                        <CheckCircle className="w-5 h-5" />
+                                        <span className="text-sm font-medium">
+                                            Message sent!
+                                        </span>
+                                    </motion.div>
+                                ) : (
+                                    <>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Name"
+                                                value={contactName}
+                                                onChange={(e) =>
+                                                    setContactName(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                required
+                                                className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-zinc-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                                            />
+                                            <input
+                                                type="email"
+                                                placeholder="Email"
+                                                value={contactEmail}
+                                                onChange={(e) =>
+                                                    setContactEmail(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                required
+                                                className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-zinc-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
+                                            />
+                                        </div>
+                                        <textarea
+                                            placeholder="Message"
+                                            value={contactMessage}
+                                            onChange={(e) =>
+                                                setContactMessage(
+                                                    e.target.value,
+                                                )
+                                            }
+                                            required
+                                            rows={3}
+                                            className="px-3 py-1.5 text-sm rounded-lg border border-zinc-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300 transition resize-none"
+                                        />
+                                        <div className="flex items-center justify-between">
+                                            {contactStatus === "error" && (
+                                                <span className="text-xs text-red-500">
+                                                    Failed to send. Try again.
+                                                </span>
+                                            )}
+                                            <motion.button
+                                                type="submit"
+                                                disabled={
+                                                    contactStatus === "sending"
+                                                }
+                                                whileHover={{ scale: 1.03 }}
+                                                whileTap={{ scale: 0.97 }}
+                                                className="ml-auto flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-medium transition disabled:opacity-60">
+                                                <Send className="w-3.5 h-3.5" />
+                                                {contactStatus === "sending"
+                                                    ? "Sending..."
+                                                    : "Send"}
+                                            </motion.button>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </motion.form>
+                    )}
+                </AnimatePresence>
             </motion.div>
         </div>
     );

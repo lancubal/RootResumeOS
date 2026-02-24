@@ -19,7 +19,7 @@ export const OWNER = {
   cv: 'https://drive.google.com/your-cv-link', // ← replace with your real URL
   social: {
     github:   'https://github.com/lancubal',
-    linkedin: 'https://linkedin.com/in/lunalancuba',
+    linkedin: 'https://linkedin.com/in/luna-lancuba-6621491b8',
     email:    'lunalancuba.sistemas@gmail.com',
   },
 };
