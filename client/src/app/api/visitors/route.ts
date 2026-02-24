@@ -1,19 +1,44 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { join } from 'path';
 
-// In-memory counter — persists for the lifetime of the process (single Docker container).
-// Resets on redeploy, which is fine for a decorative counter.
-let visitorCount = 0;
+// File-based counter — persists across hot-reloads and server restarts.
+// Falls back to in-memory if the filesystem is read-only.
+const DATA_DIR = join(process.cwd(), '.data');
+const COUNT_FILE = join(DATA_DIR, 'visitors.json');
 
-export async function GET(_req: NextRequest) {
+function readCount(): number {
+    try {
+        if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
+        if (!existsSync(COUNT_FILE)) return 0;
+        const raw = readFileSync(COUNT_FILE, 'utf-8');
+        return (JSON.parse(raw) as { count: number }).count ?? 0;
+    } catch {
+        return 0;
+    }
+}
+
+function writeCount(n: number) {
+    try {
+        if (!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true });
+        writeFileSync(COUNT_FILE, JSON.stringify({ count: n }), 'utf-8');
+    } catch {
+        // read-only filesystem — silently ignore
+    }
+}
+
+export async function GET() {
     const cookieStore = await cookies();
     const alreadyCounted = cookieStore.get('rv_visited');
 
+    let count = readCount();
     if (!alreadyCounted) {
-        visitorCount++;
+        count++;
+        writeCount(count);
     }
 
-    const res = NextResponse.json({ count: visitorCount });
+    const res = NextResponse.json({ count });
 
     if (!alreadyCounted) {
         res.cookies.set('rv_visited', '1', {

@@ -645,7 +645,7 @@ export default function RootResumeTerminal({
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
         } else if (command === "matrix") {
-            const COLS = 60;
+            const COLS = 48;
             const ROWS = 18;
             const CHARS =
                 "ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝABCDEFGHIJKL0123456789";
@@ -656,7 +656,7 @@ export default function RootResumeTerminal({
                 Array(COLS).fill(" "),
             );
             let frameCount = 0;
-            const maxFrames = 80;
+            const maxFrames = 100;
 
             const renderFrame = () => {
                 // advance drops
@@ -664,7 +664,7 @@ export default function RootResumeTerminal({
                     const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
                     if (row < ROWS) grid[row][col] = ch;
                     drops[col] =
-                        (row + 1) % (ROWS + Math.floor(Math.random() * 8));
+                        (row + 1) % (ROWS + 1 + Math.floor(Math.random() * 6));
                     // fade tail — guard against out-of-bounds
                     if (row - 1 >= 0 && row - 1 < ROWS)
                         grid[row - 1][col] =
