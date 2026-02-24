@@ -1,6 +1,6 @@
 ~~1. El comando "?" la tabla se rompe por el espaciado. Simplificar sacando la tabla y dejando el listado de comandos~~ [done] Reemplazada la box con un listado plano simple.
 ~~2. Al comando matrix hacer que sean letras verdes~~ [done] Frames usan `type: "logo"` (emerald-500).
-3. La primera linea separadora que aparece en la terminal es demasiado larga
+~~3. La primera linea separadora que aparece en la terminal es demasiado larga~~ [done] Reducida a 32 caracteres unicode.
 4. En mobile la foto y los titulos no entran en el ancho. Pasar la foto arriba y al centro de los titulos y acomodar los titulos para que entren.
 5. Agregar al comando "challenge" una explicacion de que el usuario tiene que hacer start y el numero de challenge que quiere hacer.
 6. Cuando voy a una de las otras paginas y vuelvo. Se esta matando el contenedor de terminal e iniciando uno nuevo?

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Terminal as TerminalIcon, X } from "lucide-react";
-import { QUICK_COMMANDS } from "./config";
+import { Terminal as TerminalIcon, X, Github, Linkedin, Mail } from "lucide-react";
+import { QUICK_COMMANDS, OWNER } from "./config";
 import { motion, AnimatePresence } from "motion/react";
 import { PresentationPanel } from "./components/PresentationPanel";
 import RootResumeTerminal from "./RootResumeTerminal";
@@ -105,18 +105,35 @@ export default function Home() {
 
             {/* ── Mobile: panel + floating button ── */}
             <div className="lg:hidden h-full flex flex-col">
-                <div className="flex-1 overflow-y-auto pb-24">
+                <div className="flex-1 overflow-y-auto pb-20">
                     <PresentationPanel />
                 </div>
 
-                {/* Floating terminal button */}
-                <motion.button
-                    onClick={() => setIsTerminalOpen(true)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-zinc-800 to-zinc-900 text-white rounded-full shadow-2xl flex items-center justify-center z-40">
-                    <TerminalIcon className="w-6 h-6" />
-                </motion.button>
+                {/* Fixed bottom bar: social icons (left) + terminal button (right) */}
+                <div className="fixed bottom-0 inset-x-0 h-20 flex items-center justify-between px-6 z-40 lg:hidden" style={{ backgroundColor: "#f6f6f7" }}>
+                    <div className="flex items-center gap-5">
+                        <a href={OWNER.social.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"
+                            className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
+                            <Github className="w-5 h-5 text-zinc-600" />
+                        </a>
+                        <a href={OWNER.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
+                            className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
+                            <Linkedin className="w-5 h-5 text-zinc-600" />
+                        </a>
+                        <a href={`mailto:${OWNER.social.email}`} aria-label="Email"
+                            className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
+                            <Mail className="w-5 h-5 text-zinc-600" />
+                        </a>
+                    </div>
+                    <motion.button
+                        onClick={() => setIsTerminalOpen(true)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-zinc-800 to-zinc-900 text-white rounded-full shadow-lg text-sm font-medium">
+                        <TerminalIcon className="w-5 h-5" />
+                        <span>Terminal</span>
+                    </motion.button>
+                </div>
 
                 {/* Slide-up drawer */}
                 <AnimatePresence>
