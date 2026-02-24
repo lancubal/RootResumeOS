@@ -879,14 +879,14 @@ export default function RootResumeTerminal({
                     `${API_URL}/stream?sessionId=${sessionId}&vizId=${vizId}`,
                 );
                 streamRef.current = evtSource;
-                setHistory((prev) => [...prev, { text: "", type: "output" }]);
+                setHistory((prev) => [...prev, { text: "", type: "logo" }]);
                 evtSource.onmessage = (event) => {
                     const text = atob(event.data);
                     setHistory((prev) => {
                         const newHistory = [...prev];
                         newHistory[newHistory.length - 1] = {
                             text,
-                            type: "output",
+                            type: "logo",
                         };
                         return newHistory;
                     });
