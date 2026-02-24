@@ -316,9 +316,9 @@ export const SKILL_CATEGORY_COLORS: Record<SkillCategory, string> = {
 // GUI panel pills → each one fires a real command in the terminal
 export const QUICK_COMMANDS = [
   {
-    emoji: '📁',
-    label: 'My Projects',
-    command: 'ls projects',
+    emoji: '🥠',
+    label: 'Fortune',
+    command: 'fortune',
     color: 'from-amber-500 to-orange-500',
   },
   {

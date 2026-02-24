@@ -23,12 +23,12 @@
 ~~23. En help, sacarle el emoji de ojitos al comando matrix y ponerle algo mejor.~~ [done] Descripción cambiada a "Wake up, Neo...".
 ~~25. En help, cambiar la descripcion del comando challenge.~~ [done] Línea simplificada a "List coding challenges" (sin "(then: start <n>)").
 ~~26. Cuando se ejecuta el comando challenge, mostrar una descripcion que diga que para iniciar una challenge usar el comando "start" y el numero de challenge~~ [done] El handler ya mostraba el mensaje de instrucción al listar.
-27. El comando python no hace nada
-28. Para comandos compuestos, por ejemplo visualize. Si no se agregan los argumentos esperados da error de command not found. Para estos casos explicar como se usan el comando ejecutado y dar ejemplos
-29. Darle mas onda al layout mobile.
-30. El comando ls muestra Desktop, Downloads y Docuemnts. Es correcto esto?
-31. el archivo about-me.md deberia estar en el root? (Ahora no se ve cuando se hace ls)
-32. Cuando se ejectuta el comando top, mostrar una sugerencia de como ejecutar un proceso en paralelo para probar el uso del sistema
+~~27. El comando python no hace nada~~ [done] Resuelto al quitar python/python3 del help; no se expone un intérprete interactivo.
+~~28. Para comandos compuestos, por ejemplo visualize. Si no se agregan los argumentos esperados da error de command not found. Para estos casos explicar como se usan el comando ejecutado y dar ejemplos~~ [done] Comandos compuestos sin args muestran su uso y ejemplos en lugar de "command not found".
+~~29. Darle mas onda al layout mobile.~~ [done] Layout mobile mejorado con header/footer fijos, columna centrada y foto ampliada.
+~~30. El comando ls muestra Desktop, Downloads y Docuemnts. Es correcto esto?~~ [done] ls muestra home directories correctas.
+~~31. el archivo about-me.md deberia estar en el root? (Ahora no se ve cuando se hace ls)~~ [done] about-me.md movido al root; visible en ls.
+~~32. Cuando se ejectuta el comando top, mostrar una sugerencia de como ejecutar un proceso en paralelo para probar el uso del sistema~~ [done] top muestra tip para ejecutar un proceso en paralelo.
 33. Quiza tener dos opciones para ver los proyectos sea redundante.
 34. El comando matrix, se acumulan caracteres en la ultima linea y un poco salta el scroll en la terminal mientras ejecuta. Se podria mejorar
 35. Modo noche (automatico quiza?)

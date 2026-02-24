@@ -82,12 +82,12 @@ export default function Home() {
                         />
                     </div>
                     {/* Quick Actions */}
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 px-6">
                         <div className="text-xs text-zinc-500 mb-2 uppercase tracking-widest flex items-center gap-2">
                             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                             Quick Actions
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex justify-between gap-2">
                             {QUICK_COMMANDS.map((cmd, index) => (
                                 <motion.button
                                     key={index}
@@ -189,7 +189,7 @@ export default function Home() {
                                         />
                                     </div>
                                     {/* Quick Actions in mobile drawer */}
-                                    <div className="flex-shrink-0 flex flex-wrap gap-2">
+                                    <div className="flex-shrink-0 flex justify-between gap-2">
                                         {QUICK_COMMANDS.map((cmd, index) => (
                                             <motion.button
                                                 key={index}
