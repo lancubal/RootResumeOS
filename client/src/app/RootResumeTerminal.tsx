@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import CodeEditor from "./CodeEditor";
-import { PROJECTS, OWNER, SKILLS } from "./config";
+import { PROJECTS, OWNER, SKILLS, FORTUNE_QUOTES } from "./config";
 
 interface HistoryItem {
     text: string;
@@ -100,6 +100,8 @@ export default function RootResumeTerminal({
         "visualize",
         "skills",
         "matrix",
+        "fortune",
+        "konami",
         "challenge",
         "start",
         "edit",
@@ -467,6 +469,7 @@ export default function RootResumeTerminal({
                 "Available Commands:",
                 "  ls projects    - View my projects",
                 "  skills         - Proficiency bar chart",
+                "  fortune        - Random dev quote",
                 "  cat about-me.md- My bio",
                 "  visualize <id> - Run algo demo:",
                 "    C:      bubble, selection, quick, pathfinder, dfs",
@@ -486,6 +489,47 @@ export default function RootResumeTerminal({
             setTimeout(() => inputRef.current?.focus(), 10);
         } else if (command === "clear") {
             setHistory([]);
+            setIsLoading(false);
+            setTimeout(() => inputRef.current?.focus(), 10);
+
+        } else if (command === "fortune") {
+            const q = FORTUNE_QUOTES[Math.floor(Math.random() * FORTUNE_QUOTES.length)];
+            const W = 56;
+            const bar = "+" + "-".repeat(W + 2) + "+";
+            const wrap = (text: string, w: number): string[] => {
+                const words = text.split(" ");
+                const lines: string[] = [];
+                let cur = "";
+                for (const word of words) {
+                    if ((cur + " " + word).trim().length > w) { lines.push(cur.trim()); cur = word; }
+                    else cur = (cur + " " + word).trim();
+                }
+                if (cur) lines.push(cur);
+                return lines;
+            };
+            pushToHistory("");
+            pushToHistory(bar);
+            wrap(q.text, W).forEach((l) => pushToHistory("| " + l.padEnd(W) + " |"));
+            pushToHistory("|" + " ".repeat(W + 2) + "|");
+            pushToHistory("| " + ("— " + q.author).padEnd(W) + " |");
+            pushToHistory(bar);
+            pushToHistory("");
+            setIsLoading(false);
+            setTimeout(() => inputRef.current?.focus(), 10);
+
+        } else if (command === "konami") {
+            const lines = [
+                "  ##   ##  ##   ##  ##      ####   ##    ## ####### ##",
+                "  ##   ##  ###  ##  ##     ##  ##  ## # ## ##      ##",
+                "  ##   ##  ## # ##  ##     ##  ##  ##   ## #####   ##",
+                "  ##   ##  ##  ###  ##     ##  ##  ##   ## ##      ##",
+                "   #####   ##   ##  ######  ####   ##   ## ####### ##",
+            ];
+            pushToHistory("");
+            lines.forEach((l) => pushToHistory(l, "header"));
+            pushToHistory("");
+            pushToHistory("  \u2191\u2191\u2193\u2193\u2190\u2192\u2190\u2192 B A  \u2014  Cheat code accepted. You found it.", "info");
+            pushToHistory("");
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
 
@@ -525,9 +569,9 @@ export default function RootResumeTerminal({
                     const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
                     if (row < ROWS) grid[row][col] = ch;
                     drops[col] = (row + 1) % (ROWS + Math.floor(Math.random() * 8));
-                    // fade tail
-                    if (row - 1 >= 0) grid[row - 1][col] = CHARS[Math.floor(Math.random() * CHARS.length)];
-                    if (row - 3 >= 0) grid[row - 3][col] = " ";
+                    // fade tail — guard against out-of-bounds
+                    if (row - 1 >= 0 && row - 1 < ROWS) grid[row - 1][col] = CHARS[Math.floor(Math.random() * CHARS.length)];
+                    if (row - 3 >= 0 && row - 3 < ROWS) grid[row - 3][col] = " ";
                 });
                 return grid.map((r) => r.join("")).join("\n");
             };

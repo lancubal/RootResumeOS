@@ -329,3 +329,78 @@ export const QUICK_COMMANDS = [
     color: 'from-green-500 to-emerald-500',
   },
 ];
+
+// ── Fortune quotes — shown by `fortune` terminal command ─────────────────────
+export const FORTUNE_QUOTES = [
+  { text: 'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.', author: 'Martin Fowler' },
+  { text: 'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.', author: 'Brian W. Kernighan' },
+  { text: 'Before software can be reusable it first has to be usable.', author: 'Ralph Johnson' },
+  { text: 'The best performance improvement is the transition from the nonworking state to the working state.', author: 'J. Osterhout' },
+  { text: 'Make it work, make it right, make it fast.', author: 'Kent Beck' },
+  { text: 'Premature optimization is the root of all evil.', author: 'Donald Knuth' },
+  { text: 'Programs must be written for people to read, and only incidentally for machines to execute.', author: 'Harold Abelson' },
+  { text: 'Simplicity is the soul of efficiency.', author: 'Austin Freeman' },
+  { text: 'Code is like humor. When you have to explain it, it\'s bad.', author: 'Cory House' },
+  { text: 'The only way to go fast is to go well.', author: 'Robert C. Martin' },
+  { text: 'Talk is cheap. Show me the code.', author: 'Linus Torvalds' },
+  { text: 'First, solve the problem. Then, write the code.', author: 'John Johnson' },
+  { text: 'Java is to JavaScript what Car is to Carpet.', author: 'Chris Heilmann' },
+  { text: 'It\'s not a bug — it\'s an undocumented feature.', author: 'Anonymous' },
+  { text: 'The best error message is the one that never shows up.', author: 'Thomas Fuchs' },
+  { text: 'Real programmers don\'t comment their code. If it was hard to write, it should be hard to understand.', author: 'Anonymous' },
+  { text: 'The function of good software is to make the complex appear simple.', author: 'Grady Booch' },
+  { text: 'Experience is the name everyone gives to their mistakes.', author: 'Oscar Wilde' },
+];
+
+// ── Uses — tools, hardware, and services ─────────────────────────────────────
+export const USES = [
+  {
+    category: 'Editor & IDE',
+    icon: '🖊️',
+    items: [
+      { name: 'VS Code', description: 'Primary editor. Theme: One Dark Pro. Font: Geist Mono.' },
+      { name: 'Neovim', description: 'For quick edits in the terminal. Lazy.nvim plugin manager.' },
+      { name: 'IntelliJ IDEA', description: 'When working on heavy Java / Spring Boot projects.' },
+    ],
+  },
+  {
+    category: 'Terminal',
+    icon: '⌨️',
+    items: [
+      { name: 'Warp', description: 'Modern terminal with AI command completion and blocks.' },
+      { name: 'Zsh + Oh My Zsh', description: 'Shell. Plugins: git, zsh-autosuggestions, z.' },
+      { name: 'tmux', description: 'Session management. Custom status bar, prefix: Ctrl+A.' },
+      { name: 'fzf', description: 'Fuzzy finder — history search, file jump, git branch switcher.' },
+    ],
+  },
+  {
+    category: 'Services & DevOps',
+    icon: '☁️',
+    items: [
+      { name: 'AWS EC2 + ECS', description: 'Compute. This portfolio runs on a t3.small.' },
+      { name: 'Cloudflare', description: 'DNS, CDN, and WAF in front of everything.' },
+      { name: 'GitHub', description: 'Version control. GitHub Actions for CI.' },
+      { name: 'Vercel', description: 'Staging deployments and preview URLs.' },
+      { name: 'Docker Hub', description: 'Container registry for session images.' },
+    ],
+  },
+  {
+    category: 'Hardware',
+    icon: '💻',
+    items: [
+      { name: 'MacBook Pro M2', description: '16" — absurd battery life. Best dev machine I\'ve used.' },
+      { name: 'LG 27" 4K', description: 'External monitor. IPS panel. Great for code density.' },
+      { name: 'Keychron K2 V2', description: 'Mechanical keyboard. Gateron Brown switches.' },
+      { name: 'Logitech MX Master 3', description: 'Mouse. The scroll wheel alone is worth it.' },
+    ],
+  },
+  {
+    category: 'Fonts & Design',
+    icon: '🔤',
+    items: [
+      { name: 'Geist Mono', description: 'Coding font. Used in this portfolio.' },
+      { name: 'Inter', description: 'UI font for everything web.' },
+      { name: 'Figma', description: 'Design and wireframing. Free tier is plenty.' },
+    ],
+  },
+];

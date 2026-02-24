@@ -12,7 +12,7 @@ import {
 import { motion } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
-import { OWNER, SKILLS, SKILL_CATEGORY_COLORS, type SkillCategory } from "../config";
+import { OWNER } from "../config";
 
 export function PresentationPanel() {
     const socialLinks = [
@@ -31,9 +31,15 @@ export function PresentationPanel() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                     className="flex items-center gap-6 mb-6">
-                    {/* Circular avatar — place your photo at /public/avatar.jpg */}
-                    <div className="relative shrink-0 w-24 h-24 lg:w-28 lg:h-28">
-                        <div className="w-full h-full rounded-full ring-4 ring-zinc-200 overflow-hidden shadow-lg">
+                    {/* Circular avatar */}
+                    <motion.div
+                        className="relative shrink-0 w-24 h-24 lg:w-28 lg:h-28 cursor-pointer"
+                        whileHover={{ scale: 1.07, rotate: 4 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 18 }}>
+                        <motion.div
+                            className="w-full h-full rounded-full overflow-hidden shadow-lg"
+                            whileHover={{ boxShadow: "0 0 0 5px #a1a1aa, 0 8px 24px rgba(0,0,0,0.18)" }}
+                            transition={{ duration: 0.2 }}>
                             <Image
                                 src="/avatar.jpg"
                                 alt={OWNER.name}
@@ -42,19 +48,36 @@ export function PresentationPanel() {
                                 className="w-full h-full object-cover"
                                 priority
                             />
-                        </div>
+                        </motion.div>
                         {/* Online indicator */}
                         <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white shadow" />
-                    </div>
+                    </motion.div>
 
                     {/* Name + title */}
                     <div>
                         <div className="text-zinc-500 mb-1 text-sm">
                             {OWNER.greeting}
                         </div>
-                        <h1 className="text-4xl lg:text-5xl font-bold mb-1 bg-gradient-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent">
-                            {OWNER.name}
-                        </h1>
+                        <motion.h1
+                            className="text-4xl lg:text-5xl font-bold mb-1 cursor-default select-none"
+                            whileHover="hover">
+                            <span className="inline-flex">
+                                {OWNER.name.split("").map((char, i) => (
+                                    <motion.span
+                                        key={i}
+                                        variants={{
+                                            hover: {
+                                                y: char === " " ? 0 : -6,
+                                                color: char === " " ? "inherit" : ["#18181b", "#6366f1", "#18181b"],
+                                                transition: { delay: i * 0.03, duration: 0.3, type: "spring", stiffness: 400, damping: 15 },
+                                            },
+                                        }}
+                                        className="inline-block bg-gradient-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent">
+                                        {char === " " ? "\u00a0" : char}
+                                    </motion.span>
+                                ))}
+                            </span>
+                        </motion.h1>
                         <h2 className="text-base lg:text-lg text-zinc-600 leading-snug">
                             {OWNER.title.split("\n").map((line, i) => (
                                 <span
@@ -75,27 +98,6 @@ export function PresentationPanel() {
                     className="text-zinc-600 mb-5 max-w-xl leading-relaxed text-sm lg:text-base">
                     {OWNER.description}
                 </motion.p>
-
-                {/* Skills pills */}
-            <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.35 }}
-                className="flex flex-wrap gap-1.5 mb-5">
-                {SKILLS.map((skill, i) => (
-                    <motion.span
-                        key={skill.name}
-                        initial={{ opacity: 0, scale: 0.85 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.25, delay: 0.35 + i * 0.03 }}
-                        title={`${skill.level}%`}
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                            SKILL_CATEGORY_COLORS[skill.category as SkillCategory]
-                        }`}>
-                        {skill.name}
-                    </motion.span>
-                ))}
-            </motion.div>
 
             {/* Row — Explore (right below description) */}
                 <motion.div
@@ -173,6 +175,12 @@ export function PresentationPanel() {
                     <span>Download CV</span>
                     <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
                 </motion.a>
+
+                <Link
+                    href="/uses"
+                    className="text-xs text-zinc-400 hover:text-zinc-700 transition-colors ml-auto">
+                    /uses
+                </Link>
             </motion.div>
         </div>
     );

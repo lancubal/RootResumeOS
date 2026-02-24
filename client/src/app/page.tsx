@@ -1,23 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Terminal as TerminalIcon, X } from "lucide-react";
 import { QUICK_COMMANDS } from "./config";
 import { motion, AnimatePresence } from "motion/react";
 import { PresentationPanel } from "./components/PresentationPanel";
 import RootResumeTerminal from "./RootResumeTerminal";
 
+const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+
 export default function Home() {
     const [currentCommand, setCurrentCommand] = useState("");
     const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+    const [konamiBuffer, setKonamiBuffer] = useState<string[]>([]);
 
     const handleCommandClick = (command: string) => {
         setCurrentCommand(command);
-        if (window.innerWidth < 1024) {
-            setIsTerminalOpen(true);
-        }
-        // currentCommand is cleared by the terminal via onCommandExecuted
+        if (window.innerWidth < 1024) setIsTerminalOpen(true);
     };
+
+    const handleKonamiKey = useCallback((e: KeyboardEvent) => {
+        setKonamiBuffer((prev) => {
+            const next = [...prev, e.key].slice(-KONAMI.length);
+            if (next.join(",") === KONAMI.join(",")) {
+                setCurrentCommand("konami");
+                if (window.innerWidth < 1024) setIsTerminalOpen(true);
+                return [];
+            }
+            return next;
+        });
+    }, []);
+
+    useEffect(() => {
+        window.addEventListener("keydown", handleKonamiKey);
+        return () => window.removeEventListener("keydown", handleKonamiKey);
+    }, [handleKonamiKey]);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _ = konamiBuffer; // consumed via closure
 
     return (
         <div
