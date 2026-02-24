@@ -534,7 +534,7 @@ export default function RootResumeTerminal({
                 "    C:      bubble, selection, quick, pathfinder, dfs",
                 "    Python: life, mandelbrot, montecarlo, maze",
                 "  matrix         - 👀",
-                "  challenge      - Enter coding mode",
+                "  challenge      - List coding challenges (then: start <n>)",
                 "  command &      - Run a command in the background",
                 "  -- System --",
                 "  about          - View system architecture",
@@ -826,7 +826,35 @@ export default function RootResumeTerminal({
             // --- Server-Side Commands ---
         } else {
             // --- Streaming Commands ---
-            if (command.startsWith("visualize ")) {
+            if (command === "visualize") {
+                const vizList = ["quicksort", "pathfinder", "dfs", "life", "mandelbrot", "montecarlo", "maze"];
+                pushToHistory("");
+                pushToHistory("Usage:  visualize <id>");
+                pushToHistory("");
+                pushToHistory("Available visualizations:");
+                vizList.forEach((v) => pushToHistory(`  visualize ${v}`));
+                pushToHistory("");
+                pushToHistory("Example: visualize mandelbrot", "info");
+                pushToHistory("");
+                setIsLoading(false);
+                setTimeout(() => inputRef.current?.focus(), 10);
+            } else if (command === "python" || command === "python3") {
+                pushToHistory("Running: python3 /home/demo/demo.py", "info");
+                try {
+                    const response = await fetch(`${API_URL}/exec`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ sessionId, code: "python3 /home/demo/demo.py" }),
+                    });
+                    const data = await response.json();
+                    pushToHistory(data.error || data.output || "");
+                } catch {
+                    pushToHistory("Network Error", "error");
+                } finally {
+                    setIsLoading(false);
+                    setTimeout(() => inputRef.current?.focus(), 10);
+                }
+            } else if (command.startsWith("visualize ")) {
                 const vizId = command.split(" ")[1];
                 if (streamRef.current) streamRef.current.close();
 
@@ -836,19 +864,6 @@ export default function RootResumeTerminal({
                 if (isPython) {
                     pushToHistory(
                         `[Narrator] Writing Python script to container filesystem...`,
-                        "info",
-                    );
-                    pushToHistory(
-                        `[Narrator] Executing with python3 and streaming STDOUT via SSE...`,
-                        "info",
-                    );
-                } else {
-                    pushToHistory(
-                        `[Narrator] Compiling ${vizId}.c with GCC inside the secure container...`,
-                        "info",
-                    );
-                    pushToHistory(
-                        `[Narrator] Executing binary and streaming STDOUT via Server-Sent Events...`,
                         "info",
                     );
                 }
