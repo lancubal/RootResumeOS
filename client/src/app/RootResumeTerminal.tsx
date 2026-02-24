@@ -533,7 +533,7 @@ export default function RootResumeTerminal({
                 "  visualize <id> - Run algo demo:",
                 "    C:      bubble, selection, quick, pathfinder, dfs",
                 "    Python: life, mandelbrot, montecarlo, maze",
-                "  matrix         - 👀",
+                "  matrix         - 🌧️  Green raining symbols",
                 "  challenge      - List coding challenges (then: start <n>)",
                 "  command &      - Run a command in the background",
                 "  -- System --",
