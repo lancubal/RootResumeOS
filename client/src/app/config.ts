@@ -389,7 +389,7 @@ export const USES = [
     icon: '💻',
     items: [
       { name: 'ThinkPad T14', description: 'Daily driver. Solid Linux compatibility, great keyboard.' },
-      { name: 'Samsung Odyssey G5', description: 'Curved gaming monitor. Smooth for both code and everything else.' },
+      { name: 'Acer KG271U', description: '27" 1440p monitor. Sharp display for both code and everything else.' },
       { name: 'Ultimate Hacking Keyboard', description: 'Split mechanical keyboard. Programmable, modular, built to last.' },
       { name: 'Logitech MX Master 3', description: 'Mouse. The scroll wheel alone is worth it.' },
     ],
