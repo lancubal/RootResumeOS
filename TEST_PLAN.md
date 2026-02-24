@@ -19,155 +19,133 @@ Before testing, confirm:
 
 ## 1. Home Page — Layout & Panel
 
-| # | Test | Expected | Pass? |
-|---|------|----------|-------|
-| 1.1 | Open `localhost:3000` on a desktop (≥1024px wide) | Left panel + right terminal side by side, no overflow | |
-| 1.2 | Open on mobile (or DevTools 375px) | Only panel visible; terminal icon button visible in bottom-right | |
-| 1.3 | Panel avatar is visible and circular | Circular image with green "online" dot in bottom-right corner | |
-| 1.4 | Hover over avatar | Photo should scale up + tilt slightly + indigo glow ring appears | |
-| 1.5 | Move mouse away from avatar | Smoothly springs back to original position | |
-| 1.6 | Hover over the name heading | Each letter should jump up one by one (staggered wave) and turn indigo | |
-| 1.7 | Move mouse away from name | Letters drop back to original position + color returns to dark | |
-| 1.8 | Three nav buttons are visible (Projects, Blog, About this portfolio) | Correct gradient colors: amber, rose, indigo | |
-| 1.9 | Footer row: GitHub, LinkedIn, Mail icons + Download CV button + `/uses` link | All visible and in one row | |
-| 1.10 | The visitor counter appears in the footer | e.g. "1 visit" text visible next to `/uses` | |
-| 1.11 | Refresh the page | Counter should NOT increment a second time (cookie-deduplicated for 24h) | |
-| 1.12 | Open in incognito window | Counter increments by 1 | |
+- [ ] **1.1** Open `localhost:3000` en desktop (≥1024px) → Panel izquierdo + terminal derecho, sin overflow
+- [ ] **1.2** Abrir en mobile / DevTools 375px → Solo panel visible, botón de terminal en bottom-right
+- [ ] **1.3** Avatar circular con punto verde "online" en esquina inferior derecha
+- [ ] **1.4** Hover en avatar → Escala + tilt + glow indigo
+- [ ] **1.5** Sacar mouse del avatar → Vuelve a posición original con spring
+- [ ] **1.6** Hover en el nombre → Cada letra salta en ola escalonada y se pone indigo
+- [ ] **1.7** Sacar mouse del nombre → Letras bajan y vuelven al color oscuro
+- [ ] **1.8** Tres botones visibles (Projects, Blog, About this portfolio) con gradientes amber, rose, indigo
+- [ ] **1.9** Footer: íconos GitHub, LinkedIn, Mail + botón Download CV + link `/uses`
+- [ ] **1.10** Contador de visitas visible en el footer (ej: "1 visit")
+- [ ] **1.11** Refrescar la página → El contador NO incrementa (cookie 24h)
+- [ ] **1.12** Abrir en incógnito → El contador incrementa en 1
 
 ---
 
 ## 2. Terminal — Basic Behavior
 
-| # | Test | Expected | Pass? |
-|---|------|----------|-------|
-| 2.1 | Terminal loads on desktop | Black terminal panel on the right; shows boot message + CTF hint + "Type 'help'" | |
-| 2.2 | Click anywhere on the terminal | Input field gets focus | |
-| 2.3 | Type `help` and press Enter | Lists all available commands in a categorized block | |
-| 2.4 | Check that `?` appears in the help output | Should see `  ?  - Show keyboard shortcuts` | |
-| 2.5 | Type `clear` and press Enter | Terminal history clears, prompt remains | |
-| 2.6 | Type commands, then press `↑` | Cycles through previous commands | |
-| 2.7 | After cycling history, press `↓` | Returns to empty input | |
-| 2.8 | Start typing `vis`, press `Tab` | Autocompletes to `visualize ` | |
-| 2.9 | Type `Ctrl+L` | Terminal clears (same as `clear`) | |
-| 2.10 | On mobile: tap the terminal button (bottom-right) | Terminal drawer slides up to 75vh | |
-| 2.11 | On mobile: tap the ✕ button | Terminal closes | |
+- [ ] **2.1** Terminal carga en desktop → Panel negro a la derecha con boot message + hint CTF + "Type 'help'"
+- [ ] **2.2** Click en cualquier parte del terminal → El input recibe foco
+- [ ] **2.3** Escribir `help` + Enter → Lista todos los comandos disponibles
+- [ ] **2.4** Verificar que `?` aparece en la salida de `help`
+- [ ] **2.5** Escribir `clear` + Enter → Historial se borra, prompt queda
+- [ ] **2.6** Escribir comandos, luego presionar `↑` → Cicla por el historial
+- [ ] **2.7** Luego de ciclar, presionar `↓` → Vuelve al input vacío
+- [ ] **2.8** Escribir `vis` + Tab → Autocompleta a `visualize `
+- [ ] **2.9** Presionar `Ctrl+L` → Terminal se borra (igual que `clear`)
+- [ ] **2.10** Mobile: tocar el botón de terminal → Drawer sube a 75vh
+- [ ] **2.11** Mobile: tocar el botón ✕ → Terminal se cierra
 
 ---
 
 ## 3. Terminal — CRT Mode Toggle
 
-| # | Test | Expected | Pass? |
-|---|------|----------|-------|
-| 3.1 | Locate the TV icon button in the terminal title bar (top-right) | Small monitor icon visible | |
-| 3.2 | Click the CRT toggle button | Title bar turns near-black; all terminal text turns green; horizontal scanlines overlay appears | |
-| 3.3 | In CRT mode, type any command | Output text and prompt are phosphor green | |
-| 3.4 | In CRT mode, trigger an error (e.g. type a bad command) | Error text stays red (intentional exception) | |
-| 3.5 | Click the CRT toggle again | Terminal returns to default dark theme | |
-| 3.6 | CRT toggle button is highlighted/green when active | Button background is dark green tinted when on | |
+- [ ] **3.1** Ícono de TV visible en la barra del terminal (top-right)
+- [ ] **3.2** Click en CRT toggle → Barra se vuelve casi negra, texto verde, overlay de scanlines horizontal
+- [ ] **3.3** En CRT mode, escribir cualquier comando → Output y prompt son verde fosforescente
+- [ ] **3.4** En CRT mode, triggerear un error (comando inválido) → Texto de error sigue siendo rojo
+- [ ] **3.5** Click en CRT toggle de nuevo → Vuelve al tema oscuro por defecto
+- [ ] **3.6** Botón CRT aparece con fondo verde tenue cuando está activo
 
 ---
 
 ## 4. Terminal — All Commands
 
-### 4a. Client-side commands
+### 4a. Comandos client-side
 
-| # | Command | Expected output | Pass? |
-|---|---------|----------------|-------|
-| 4.1 | `about` | ASCII "R" logo with system info table (OS, shell, memory, etc.) | |
-| 4.2 | `whoami` | Returns current username (e.g. `guest`) | |
-| 4.3 | `ls projects` | Lists all projects with name, tech stack, year | |
-| 4.4 | `skills` | ASCII bar chart grouped by category (Languages, Backend, Frontend, DevOps) | |
-| 4.5 | `fortune` | ASCII box with a random developer quote and author | |
-| 4.6 | `fortune` (run twice) | Different quote each time (random) | |
-| 4.7 | `?` | Box with 5 keyboard shortcuts listed (arrows, Tab, Enter, Ctrl+C, Ctrl+L, Konami) | |
-| 4.8 | `matrix` | Green character rain animation starts; stops after ~5 seconds | |
-| 4.9 | `matrix`, then `Ctrl+C` | Rain stops immediately | |
-| 4.10 | `konami` | ASCII "DUFELL" art banner + cheat code message | |
+- [ ] **4.1** `about` → Logo ASCII "R" con tabla de info del sistema
+- [ ] **4.2** `whoami` → Devuelve el username actual (`guest`)
+- [ ] **4.3** `ls projects` → Lista proyectos con nombre, tech stack y año
+- [ ] **4.4** `skills` → Bar chart ASCII agrupado por categoría
+- [ ] **4.5** `fortune` → Box ASCII con quote de dev + autor
+- [ ] **4.6** `fortune` dos veces → Quote diferente cada vez
+- [ ] **4.7** `?` → Box con shortcuts: flechas, Tab, Enter, Ctrl+C, Ctrl+L, Konami
+- [ ] **4.8** `matrix` → Lluvia de caracteres verde; para solo después de ~5 segundos
+- [ ] **4.9** `matrix` + `Ctrl+C` → La lluvia se corta inmediatamente
+- [ ] **4.10** `konami` → Banner ASCII que dice "KONAMI" + mensaje del cheat code
 
-### 4b. Konami Easter Egg (keyboard)
+### 4b. Konami Easter Egg (teclado)
 
-| # | Test | Expected | Pass? |
-|---|------|----------|-------|
-| 4.11 | With focus on the page (not in terminal input), press: `↑ ↑ ↓ ↓ ← → ← → b a` | Terminal injects and runs the `konami` command automatically | |
-| 4.12 | Partial sequence (e.g. only `↑ ↑ ↓`), then pause | Buffer resets gracefully; nothing happens | |
+- [ ] **4.11** Con foco en la página (no en el input del terminal), presionar `↑ ↑ ↓ ↓ ← → ← → b a` → El terminal inyecta y ejecuta `konami` automáticamente
+- [ ] **4.12** Secuencia parcial (ej: solo `↑ ↑ ↓`) y parar → Buffer se resetea, nada pasa
 
-### 4c. Docker-backed commands (requires server + Docker)
+### 4c. Comandos con Docker (requiere server + Docker)
 
-| # | Command | Expected | Pass? |
-|---|---------|----------|-------|
-| 4.13 | `ls` | Docker container lists `/home/guest` files | |
-| 4.14 | `cat about-me.md` | Prints bio content | |
-| 4.15 | `python3 -c "print('hello')"` | Returns `hello` | |
-| 4.16 | `gcc --version` | Returns GCC version string | |
-| 4.17 | `top` | Streams real-time CPU/mem stats; `Ctrl+C` stops it | |
-| 4.18 | `visualize bubble` | Launches bubble sort visualization in C | |
-| 4.19 | `visualize life` | Conway's Game of Life starts | |
-| 4.20 | `challenge` | Starts the CTF coding challenge | |
+- [ ] **4.13** `ls` → Lista archivos en `/home/guest` del container
+- [ ] **4.14** `cat about-me.md` → Imprime el bio
+- [ ] **4.15** `python3 -c "print('hello')"` → Devuelve `hello`
+- [ ] **4.16** `gcc --version` → Devuelve versión de GCC
+- [ ] **4.17** `top` → Streamea stats de CPU/mem en tiempo real; `Ctrl+C` lo detiene
+- [ ] **4.18** `visualize bubble` → Lanza visualización de bubble sort en C
+- [ ] **4.19** `visualize life` → Conway's Game of Life arranca
+- [ ] **4.20** `challenge` → Inicia el CTF coding challenge
 
 ---
 
 ## 5. Navigation — All Pages
 
-| # | Route | Expected | Pass? |
-|---|-------|----------|-------|
-| 5.1 | Click **Projects** button | Navigates to `/projects`; shows project cards | |
-| 5.2 | Click **Blog** button | Navigates to `/blog`; shows post cards | |
-| 5.3 | Click a blog card | Navigates to `/blog/[slug]`; full article renders with reading time, tags, back button | |
-| 5.4 | `/blog/this-slug-does-not-exist` | Returns 404 page (not a crash) | |
-| 5.5 | Click **About this portfolio** | Navigates to `/about`; content loads | |
-| 5.6 | Click `/uses` link in panel footer | Navigates to `/uses`; tools/hardware grid renders | |
-| 5.7 | Check `/uses` hardware section | Should show: ThinkPad T14, Acer KG271U, Ultimate Hacking Keyboard, MX Master 3 | |
-| 5.8 | Browser back button from any page | Returns to home correctly | |
+- [ ] **5.1** Click **Projects** → Navega a `/projects`, muestra las cards de proyectos
+- [ ] **5.2** Click **Blog** → Navega a `/blog`, muestra las cards de posts
+- [ ] **5.3** Click en una card de blog → Navega a `/blog/[slug]`, artículo completo con tiempo de lectura, tags y botón back
+- [ ] **5.4** Ir a `/blog/este-slug-no-existe` → Renderiza 404 (no crash)
+- [ ] **5.5** Click **About this portfolio** → Navega a `/about`, carga el contenido
+- [ ] **5.6** Click `/uses` en el footer del panel → Navega a `/uses`, grilla de herramientas renderizada
+- [ ] **5.7** Sección Hardware de `/uses` muestra: ThinkPad T14, Acer KG271U, Ultimate Hacking Keyboard, MX Master 3
+- [ ] **5.8** Botón back del browser desde cualquier página → Vuelve al home correctamente
 
 ---
 
 ## 6. SEO & Metadata
 
-Open DevTools → Elements and check `<head>` on each page:
+Abrir DevTools → Elements y revisar `<head>` en cada página:
 
-| # | Page | Expected `<title>` | Pass? |
-|---|------|--------------------|-------|
-| 6.1 | `/` | Contains owner name | |
-| 6.2 | `/blog` | Contains "Blog" | |
-| 6.3 | `/blog/[slug]` | Contains article title | |
-| 6.4 | `/projects` | Contains "Projects" | |
-| 6.5 | `/about` | Contains "About" | |
-| 6.6 | `/uses` | "Uses — Luna Lancuba" | |
+- [ ] **6.1** `/` → Title contiene el nombre de la owner
+- [ ] **6.2** `/blog` → Title contiene "Blog"
+- [ ] **6.3** `/blog/[slug]` → Title contiene el título del artículo
+- [ ] **6.4** `/projects` → Title contiene "Projects"
+- [ ] **6.5** `/about` → Title contiene "About"
+- [ ] **6.6** `/uses` → Title es "Uses — Luna Lancuba"
 
 ---
 
 ## 7. Animations & Transitions
 
-| # | Test | Expected | Pass? |
-|---|------|----------|-------|
-| 7.1 | Page first load | Panel and terminal fade in from below (staggered `opacity: 0 → 1, y: 20 → 0`) | |
-| 7.2 | Click any nav button (Projects, Blog, About) | Scale-up animation on tap/click | |
-| 7.3 | Hover over footer social icons (GitHub, LinkedIn, Mail) | Background lightens slightly | |
-| 7.4 | Hover over Download CV button | Slight scale + white overlay shimmer | |
-| 7.5 | Hover over `/uses` link | Text darkens from zinc-400 to zinc-700 | |
+- [ ] **7.1** Primer carga de página → Panel y terminal hacen fade-in desde abajo (opacity 0→1, y 20→0)
+- [ ] **7.2** Click en botón de nav (Projects, Blog, About) → Animación de scale en tap/click
+- [ ] **7.3** Hover en íconos sociales del footer → Fondo se aclara levemente
+- [ ] **7.4** Hover en botón Download CV → Leve scale + shimmer blanco
+- [ ] **7.5** Hover en link `/uses` → Texto se oscurece de zinc-400 a zinc-700
 
 ---
 
-## 8. Quick-Action Buttons (GUI Terminal Injection)
+## 8. Quick-Action Buttons
 
-| # | Test | Expected | Pass? |
-|---|------|----------|-------|
-| 8.1 | Click any quick-action button below the terminal | Command appears in terminal typewriter-style, then executes | |
-| 8.2 | Verify button colors match nav buttons (Projects = amber, Blog = rose, About = indigo) | Colors match | |
+- [ ] **8.1** Click en cualquier quick-action button debajo del terminal → Comando aparece en el terminal estilo typewriter y se ejecuta
+- [ ] **8.2** Colores de botones coinciden con los botones de nav (Projects = amber, Blog = rose, About = indigo)
 
 ---
 
 ## 9. Edge Cases & Robustness
 
-| # | Test | Expected | Pass? |
-|---|------|----------|-------|
-| 9.1 | Type a completely unknown command (e.g. `foobar`) | Backend returns error or "command not found" | |
-| 9.2 | Spam Enter rapidly | No duplicate commands or broken state | |
-| 9.3 | Type a very long string (200+ chars) | Input doesn't break layout; wraps or scrolls | |
-| 9.4 | Navigate to a non-existent page (`/xyz`) | 404 page renders (no crash) | |
-| 9.5 | Open with server DOWN (Docker not running) | Terminal shows "Connection Error: ..." gracefully | |
-| 9.6 | Run `matrix` and navigate to `/projects` and back | No memory leak / stale animation on return | |
-| 9.7 | `/api/visitors` endpoint directly via `fetch` | Returns `{ count: N }` JSON | |
+- [ ] **9.1** Comando desconocido (ej: `foobar`) → Backend devuelve error o "command not found"
+- [ ] **9.2** Spam de Enter rapidamente → No hay comandos duplicados ni estado roto
+- [ ] **9.3** Escribir string muy largo (200+ chars) → Input no rompe el layout
+- [ ] **9.4** Navegar a página inexistente (`/xyz`) → Renderiza 404, no crash
+- [ ] **9.5** Abrir con el server DOWN (Docker no corriendo) → Terminal muestra "Connection Error: ..." gracefully
+- [ ] **9.6** Correr `matrix` y navegar a `/projects` y volver → Sin animación residual
+- [ ] **9.7** Llamar `/api/visitors` directo → Devuelve JSON `{ count: N }`
 
 ---
 
