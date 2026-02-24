@@ -3,6 +3,8 @@ import { cookies } from 'next/headers';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 
+export const dynamic = 'force-dynamic';
+
 // File-based counter — persists across hot-reloads and server restarts.
 // Falls back to in-memory if the filesystem is read-only.
 const DATA_DIR = join(process.cwd(), '.data');
