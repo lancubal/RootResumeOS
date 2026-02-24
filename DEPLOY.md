@@ -1,13 +1,3 @@
-ECR
-841162713852.dkr.ecr.us-east-1.amazonaws.com/rootresume/
-
-Roles
-GitHubActions_ECR_Access arn:aws:iam::841162713852:role/GitHubActions_ECR_Access
-EC2_ECR_ReadOnly arn:aws:iam::841162713852:role/EC2_ECR_ReadOnly
-
-EC2
-18.214.236.45
-
 # Guía de Despliegue en Producción (AWS) - RootResume
 
 Esta guía detalla el despliegue de la aplicación en AWS utilizando un flujo de trabajo de CI/CD con GitHub Actions, Amazon ECR (Elastic Container Registry) y una instancia EC2. Este es el método recomendado para un entorno de producción robusto y escalable.
