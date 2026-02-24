@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import confetti from "canvas-confetti";
 import CodeEditor from "./CodeEditor";
+import { Tv2 } from "lucide-react";
 import { PROJECTS, OWNER, SKILLS, FORTUNE_QUOTES } from "./config";
 
 interface HistoryItem {
@@ -90,6 +91,9 @@ export default function RootResumeTerminal({
     const [editorFilename, setEditorFilename] = useState("");
     const [editorContent, setEditorContent] = useState("");
 
+    // CRT phosphor mode
+    const [crtMode, setCrtMode] = useState(false);
+
     // Ref to hold the active EventSource stream for commands like 'top' or 'visualize'
     const streamRef = useRef<EventSource | null>(null);
 
@@ -109,6 +113,7 @@ export default function RootResumeTerminal({
         "about",
         "top",
         "help",
+        "?",
         "clear",
         "whoami",
         "login",
@@ -163,6 +168,13 @@ export default function RootResumeTerminal({
     // Global Ctrl+C handler for streams
     useEffect(() => {
         const handleGlobalKeyDown = (e: KeyboardEvent) => {
+            if (e.ctrlKey && (e.key === "l" || e.key === "L")) {
+                e.preventDefault();
+                setHistory([]);
+                setIsLoading(false);
+                setTimeout(() => inputRef.current?.focus(), 10);
+                return;
+            }
             if (e.ctrlKey && (e.key === "c" || e.key === "C")) {
                 if (streamRef.current) {
                     e.preventDefault();
@@ -481,7 +493,8 @@ export default function RootResumeTerminal({
                 "  about          - View system architecture",
                 "  top            - Real-time container resource usage",
                 "  help           - Show this help message",
-                "  clear          - Clear terminal",
+                "  ?              - Show keyboard shortcuts",
+                "  clear          - Clear terminal  (or Ctrl+L)",
                 "  [linux]        - Run real commands (ls, python, etc.)",
             ];
             helpLines.forEach((l) => pushToHistory(l));
@@ -491,9 +504,11 @@ export default function RootResumeTerminal({
             setHistory([]);
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
-
         } else if (command === "fortune") {
-            const q = FORTUNE_QUOTES[Math.floor(Math.random() * FORTUNE_QUOTES.length)];
+            const q =
+                FORTUNE_QUOTES[
+                    Math.floor(Math.random() * FORTUNE_QUOTES.length)
+                ];
             const W = 56;
             const bar = "+" + "-".repeat(W + 2) + "+";
             const wrap = (text: string, w: number): string[] => {
@@ -501,22 +516,43 @@ export default function RootResumeTerminal({
                 const lines: string[] = [];
                 let cur = "";
                 for (const word of words) {
-                    if ((cur + " " + word).trim().length > w) { lines.push(cur.trim()); cur = word; }
-                    else cur = (cur + " " + word).trim();
+                    if ((cur + " " + word).trim().length > w) {
+                        lines.push(cur.trim());
+                        cur = word;
+                    } else cur = (cur + " " + word).trim();
                 }
                 if (cur) lines.push(cur);
                 return lines;
             };
             pushToHistory("");
             pushToHistory(bar);
-            wrap(q.text, W).forEach((l) => pushToHistory("| " + l.padEnd(W) + " |"));
+            wrap(q.text, W).forEach((l) =>
+                pushToHistory("| " + l.padEnd(W) + " |"),
+            );
             pushToHistory("|" + " ".repeat(W + 2) + "|");
             pushToHistory("| " + ("— " + q.author).padEnd(W) + " |");
             pushToHistory(bar);
             pushToHistory("");
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
-
+        } else if (command === "?") {
+            const lines = [
+                "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
+                "\u2502          KEYBOARD SHORTCUTS           \u2502",
+                "\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524",
+                "\u2502  \u2191 / \u2193        Navigate history        \u2502",
+                "\u2502  Tab          Autocomplete             \u2502",
+                "\u2502  Enter        Submit command           \u2502",
+                "\u2502  Ctrl+C       Interrupt stream         \u2502",
+                "\u2502  Ctrl+L       Clear terminal           \u2502",
+                "\u2502  \u2191\u2191\u2193\u2193\u2190\u2192\u2190\u2192BA   ???                     \u2502",
+                "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+            ];
+            pushToHistory("");
+            lines.forEach((l) => pushToHistory(l, "info"));
+            pushToHistory("");
+            setIsLoading(false);
+            setTimeout(() => inputRef.current?.focus(), 10);
         } else if (command === "konami") {
             const lines = [
                 "  ##   ##  ##   ##  ##      ####   ##    ## ####### ##",
@@ -528,14 +564,21 @@ export default function RootResumeTerminal({
             pushToHistory("");
             lines.forEach((l) => pushToHistory(l, "header"));
             pushToHistory("");
-            pushToHistory("  \u2191\u2191\u2193\u2193\u2190\u2192\u2190\u2192 B A  \u2014  Cheat code accepted. You found it.", "info");
+            pushToHistory(
+                "  \u2191\u2191\u2193\u2193\u2190\u2192\u2190\u2192 B A  \u2014  Cheat code accepted. You found it.",
+                "info",
+            );
             pushToHistory("");
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
-
         } else if (command === "skills") {
             const BAR_WIDTH = 12;
-            const CATEGORIES = ["Languages", "Backend", "Frontend", "DevOps"] as const;
+            const CATEGORIES = [
+                "Languages",
+                "Backend",
+                "Frontend",
+                "DevOps",
+            ] as const;
             pushToHistory("─".repeat(44));
             pushToHistory("  SKILL PROFICIENCY");
             pushToHistory("─".repeat(44));
@@ -544,7 +587,8 @@ export default function RootResumeTerminal({
                 pushToHistory(`  [${cat}]`);
                 SKILLS.filter((s) => s.category === cat).forEach((s) => {
                     const filled = Math.round((s.level / 100) * BAR_WIDTH);
-                    const bar = "█".repeat(filled) + "░".repeat(BAR_WIDTH - filled);
+                    const bar =
+                        "█".repeat(filled) + "░".repeat(BAR_WIDTH - filled);
                     const label = s.name.padEnd(12, " ");
                     pushToHistory(`  ${label} ${bar}  ${s.level}%`);
                 });
@@ -553,13 +597,17 @@ export default function RootResumeTerminal({
             pushToHistory("─".repeat(44));
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
-
         } else if (command === "matrix") {
             const COLS = 60;
             const ROWS = 18;
-            const CHARS = "ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝABCDEFGHIJKL0123456789";
-            const drops = Array.from({ length: COLS }, () => Math.floor(Math.random() * ROWS));
-            const grid: string[][] = Array.from({ length: ROWS }, () => Array(COLS).fill(" "));
+            const CHARS =
+                "ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝABCDEFGHIJKL0123456789";
+            const drops = Array.from({ length: COLS }, () =>
+                Math.floor(Math.random() * ROWS),
+            );
+            const grid: string[][] = Array.from({ length: ROWS }, () =>
+                Array(COLS).fill(" "),
+            );
             let frameCount = 0;
             const maxFrames = 80;
 
@@ -568,10 +616,14 @@ export default function RootResumeTerminal({
                 drops.forEach((row, col) => {
                     const ch = CHARS[Math.floor(Math.random() * CHARS.length)];
                     if (row < ROWS) grid[row][col] = ch;
-                    drops[col] = (row + 1) % (ROWS + Math.floor(Math.random() * 8));
+                    drops[col] =
+                        (row + 1) % (ROWS + Math.floor(Math.random() * 8));
                     // fade tail — guard against out-of-bounds
-                    if (row - 1 >= 0 && row - 1 < ROWS) grid[row - 1][col] = CHARS[Math.floor(Math.random() * CHARS.length)];
-                    if (row - 3 >= 0 && row - 3 < ROWS) grid[row - 3][col] = " ";
+                    if (row - 1 >= 0 && row - 1 < ROWS)
+                        grid[row - 1][col] =
+                            CHARS[Math.floor(Math.random() * CHARS.length)];
+                    if (row - 3 >= 0 && row - 3 < ROWS)
+                        grid[row - 3][col] = " ";
                 });
                 return grid.map((r) => r.join("")).join("\n");
             };
@@ -583,7 +635,10 @@ export default function RootResumeTerminal({
                 if (frameCount >= maxFrames || !streamRef.current) {
                     clearInterval(interval);
                     streamRef.current = null;
-                    setHistory((prev) => [...prev, { text: "[matrix] Simulation ended.", type: "output" }]);
+                    setHistory((prev) => [
+                        ...prev,
+                        { text: "[matrix] Simulation ended.", type: "output" },
+                    ]);
                     setIsLoading(false);
                     setTimeout(() => inputRef.current?.focus(), 10);
                     return;
@@ -598,9 +653,10 @@ export default function RootResumeTerminal({
             }, 80);
 
             // store a fake EventSource-shaped object so Ctrl+C can kill it
-            streamRef.current = { close: () => clearInterval(interval) } as unknown as EventSource;
+            streamRef.current = {
+                close: () => clearInterval(interval),
+            } as unknown as EventSource;
             setIsLoading(true);
-
         } else if (command === "ls projects") {
             pushToHistory(
                 JSON.stringify(
@@ -886,12 +942,32 @@ export default function RootResumeTerminal({
             <div
                 className="relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-lg border border-zinc-800 bg-black shadow-2xl font-mono text-sm"
                 onClick={handleTerminalClick}>
-                <div className="flex items-center justify-center border-b border-zinc-800 bg-gray-800 px-4 py-2">
-                    <div className="text-zinc-400 text-sm font-bold">
+                <div className={`flex items-center gap-2 border-b border-zinc-800 px-4 py-2 ${crtMode ? "bg-zinc-950" : "bg-gray-800"}`}>
+                    <div className="flex-1" />
+                    <div className={`text-sm font-bold ${crtMode ? "text-green-400" : "text-zinc-400"}`}>
                         {username}@RootResume: {cwd}
                     </div>
+                    <div className="flex-1 flex justify-end">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); setCrtMode(p => !p); }}
+                            title="Toggle CRT mode"
+                            className={`p-1.5 rounded transition-colors ${crtMode ? "text-green-400 bg-green-900/30 hover:bg-green-900/50" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-700"}`}>
+                            <Tv2 className="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
-                <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
+                {crtMode && (
+                    <div
+                        aria-hidden="true"
+                        className="pointer-events-none absolute inset-0 z-10 rounded-lg overflow-hidden"
+                        style={{
+                            background: "repeating-linear-gradient(to bottom, transparent 0px, transparent 1px, rgba(0,0,0,0.18) 1px, rgba(0,0,0,0.18) 2px)",
+                        }}
+                    />
+                )}
+                <div
+                    className="flex-1 overflow-y-auto overflow-x-hidden p-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent"
+                    style={crtMode ? { textShadow: "0 0 5px rgba(0,255,80,0.6), 0 0 2px rgba(0,255,80,0.9)" } : undefined}>
                     {isInitializing && (
                         <div className="animate-pulse text-green-500">
                             Booting RootResume OS...
@@ -902,7 +978,7 @@ export default function RootResumeTerminal({
                             key={i}
                             className="whitespace-pre-wrap break-words leading-relaxed mb-1">
                             {item.type === "cmd" ? (
-                                <div className="text-green-400 font-bold">
+                                <div className={`font-bold ${crtMode ? "text-green-300" : "text-green-400"}`}>
                                     <span className="shrink-0">
                                         {item.username || username}@RootResume:
                                         {item.cwd || "~"}${" "}
@@ -912,17 +988,23 @@ export default function RootResumeTerminal({
                             ) : (
                                 <div
                                     className={
-                                        item.type === "error"
-                                            ? "text-red-400"
-                                            : item.type === "header"
-                                              ? "text-blue-400 font-bold"
-                                              : item.type === "info"
-                                                ? "text-yellow-400"
-                                                : item.type === "logo"
-                                                  ? "text-emerald-500"
-                                                  : item.type === "viz"
-                                                    ? "text-cyan-400 italic"
-                                                    : "text-zinc-300"
+                                        crtMode
+                                            ? item.type === "error"
+                                                ? "text-red-400"
+                                                : item.type === "header"
+                                                  ? "text-green-300 font-bold"
+                                                  : "text-green-400"
+                                            : item.type === "error"
+                                              ? "text-red-400"
+                                              : item.type === "header"
+                                                ? "text-blue-400 font-bold"
+                                                : item.type === "info"
+                                                  ? "text-yellow-400"
+                                                  : item.type === "logo"
+                                                    ? "text-emerald-500"
+                                                    : item.type === "viz"
+                                                      ? "text-cyan-400 italic"
+                                                      : "text-zinc-300"
                                     }>
                                     {item.text}
                                 </div>
@@ -933,7 +1015,7 @@ export default function RootResumeTerminal({
                         <form
                             onSubmit={handleSubmit}
                             className="flex items-center">
-                            <span className="mr-2 text-green-500 shrink-0">
+                            <span className={`mr-2 shrink-0 ${crtMode ? "text-green-400" : "text-green-500"}`}>
                                 {username}@RootResume:{cwd}$
                             </span>
                             <input
@@ -944,7 +1026,7 @@ export default function RootResumeTerminal({
                                 onKeyDown={handleKeyDown}
                                 disabled={isLoading}
                                 autoFocus
-                                className="w-full flex-1 border-none bg-transparent p-0 text-zinc-100 outline-none focus:ring-0 placeholder-zinc-600"
+                                className={`w-full flex-1 border-none bg-transparent p-0 outline-none focus:ring-0 placeholder-zinc-600 ${crtMode ? "text-green-400" : "text-zinc-100"}`}
                                 autoComplete="off"
                                 spellCheck="false"
                             />

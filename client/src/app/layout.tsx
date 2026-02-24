@@ -18,7 +18,8 @@ export const metadata: Metadata = {
         "Full Stack Developer. Explore my work in a real Linux terminal inside your browser.",
     openGraph: {
         title: "Luna Lancuba — Portfolio",
-        description: "Full Stack Developer. Explore my work in a real Linux terminal inside your browser.",
+        description:
+            "Full Stack Developer. Explore my work in a real Linux terminal inside your browser.",
         type: "website",
     },
 };

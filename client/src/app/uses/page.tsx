@@ -8,7 +8,8 @@ export const metadata: Metadata = {
     description: "The tools, hardware, fonts, and services I use every day.",
     openGraph: {
         title: `Uses — ${OWNER.name}`,
-        description: "The tools, hardware, fonts, and services I use every day.",
+        description:
+            "The tools, hardware, fonts, and services I use every day.",
         type: "website",
     },
 };

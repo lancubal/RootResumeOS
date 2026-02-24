@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
     Github,
     Linkedin,
@@ -15,6 +16,15 @@ import Link from "next/link";
 import { OWNER } from "../config";
 
 export function PresentationPanel() {
+    const [visitors, setVisitors] = useState<number | null>(null);
+
+    useEffect(() => {
+        fetch("/api/visitors")
+            .then((r) => r.json())
+            .then((d) => setVisitors(d.count))
+            .catch(() => {});
+    }, []);
+
     const socialLinks = [
         { icon: Github, href: OWNER.social.github, label: "GitHub" },
         { icon: Linkedin, href: OWNER.social.linkedin, label: "LinkedIn" },
@@ -35,10 +45,17 @@ export function PresentationPanel() {
                     <motion.div
                         className="relative shrink-0 w-24 h-24 lg:w-28 lg:h-28 cursor-pointer"
                         whileHover={{ scale: 1.12, rotate: -6 }}
-                        transition={{ type: "spring", stiffness: 260, damping: 14 }}>
+                        transition={{
+                            type: "spring",
+                            stiffness: 260,
+                            damping: 14,
+                        }}>
                         <motion.div
                             className="w-full h-full rounded-full overflow-hidden shadow-lg"
-                            whileHover={{ boxShadow: "0 0 0 3px #6366f1, 0 0 28px rgba(99,102,241,0.5), 0 12px 32px rgba(0,0,0,0.25)" }}
+                            whileHover={{
+                                boxShadow:
+                                    "0 0 0 3px #6366f1, 0 0 28px rgba(99,102,241,0.5), 0 12px 32px rgba(0,0,0,0.25)",
+                            }}
                             transition={{ duration: 0.22 }}>
                             <Image
                                 src="/avatar.jpg"
@@ -68,10 +85,22 @@ export function PresentationPanel() {
                                         variants={{
                                             hover: {
                                                 y: char === " " ? 0 : -7,
-                                                color: char === " " ? "#18181b" : "#6366f1",
+                                                color:
+                                                    char === " "
+                                                        ? "#18181b"
+                                                        : "#6366f1",
                                                 transition: {
-                                                    y: { type: "spring", stiffness: 420, damping: 14, delay: i * 0.03 },
-                                                    color: { type: "tween", duration: 0.18, delay: i * 0.03 },
+                                                    y: {
+                                                        type: "spring",
+                                                        stiffness: 420,
+                                                        damping: 14,
+                                                        delay: i * 0.03,
+                                                    },
+                                                    color: {
+                                                        type: "tween",
+                                                        duration: 0.18,
+                                                        delay: i * 0.03,
+                                                    },
                                                 },
                                             },
                                         }}
@@ -103,7 +132,7 @@ export function PresentationPanel() {
                     {OWNER.description}
                 </motion.p>
 
-            {/* Row — Explore (right below description) */}
+                {/* Row — Explore (right below description) */}
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -185,6 +214,12 @@ export function PresentationPanel() {
                     className="text-xs text-zinc-400 hover:text-zinc-700 transition-colors ml-auto">
                     /uses
                 </Link>
+
+                {visitors !== null && (
+                    <span className="text-xs text-zinc-400">
+                        {visitors.toLocaleString()} visit{visitors === 1 ? "" : "s"}
+                    </span>
+                )}
             </motion.div>
         </div>
     );

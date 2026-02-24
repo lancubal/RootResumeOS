@@ -7,7 +7,18 @@ import { motion, AnimatePresence } from "motion/react";
 import { PresentationPanel } from "./components/PresentationPanel";
 import RootResumeTerminal from "./RootResumeTerminal";
 
-const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+const KONAMI = [
+    "ArrowUp",
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowLeft",
+    "ArrowRight",
+    "b",
+    "a",
+];
 
 export default function Home() {
     const [currentCommand, setCurrentCommand] = useState("");

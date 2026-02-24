@@ -8,9 +8,11 @@ import { ArrowLeft, Clock, Calendar, Tag as TagIcon } from "lucide-react";
 type PostParams = { slug: string };
 
 // ── Metadata generation ───────────────────────────────────────────────────────
-export async function generateMetadata(
-    { params }: { params: Promise<PostParams> }
-): Promise<Metadata> {
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<PostParams>;
+}): Promise<Metadata> {
     const { slug } = await params;
     const post = BLOG_POSTS.find((p) => p.slug === slug);
     if (!post) return { title: "Post not found" };
@@ -90,9 +92,7 @@ export default async function BlogPostPage({
     if (!post) notFound();
 
     return (
-        <div
-            className="min-h-screen"
-            style={{ backgroundColor: "#f6f6f7" }}>
+        <div className="min-h-screen" style={{ backgroundColor: "#f6f6f7" }}>
             <div className="max-w-2xl mx-auto px-6 py-12">
                 {/* Back */}
                 <Link
