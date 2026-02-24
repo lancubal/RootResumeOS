@@ -626,7 +626,7 @@ export default function RootResumeTerminal({
             };
 
             pushToHistory("[matrix] Press Ctrl+C to exit");
-            setHistory((prev) => [...prev, { text: "", type: "output" }]);
+            setHistory((prev) => [...prev, { text: "", type: "logo" }]);
 
             const interval = setInterval(() => {
                 if (frameCount >= maxFrames || !streamRef.current) {
@@ -643,7 +643,7 @@ export default function RootResumeTerminal({
                 const frame = renderFrame();
                 setHistory((prev) => {
                     const next = [...prev];
-                    next[next.length - 1] = { text: frame, type: "output" };
+                    next[next.length - 1] = { text: frame, type: "logo" };
                     return next;
                 });
                 frameCount++;

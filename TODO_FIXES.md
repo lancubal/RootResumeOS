@@ -1,4 +1,4 @@
-1. El comando "?" la tabla se rompe por el espaciado. Simplificar sacando la tabla y dejando el listado de comandos
+~~1. El comando "?" la tabla se rompe por el espaciado. Simplificar sacando la tabla y dejando el listado de comandos~~ ✅ Reemplazada la box con un listado plano simple.
 2. Al comando matrix hacer que sean letras verdes
 3. La primera linea separadora que aparece en la terminal es demasiado larga
 4. En mobile la foto y los titulos no entran en el ancho. Pasar la foto arriba y al centro de los titulos y acomodar los titulos para que entren.
@@ -37,4 +37,4 @@
 31. el archivo about-me.md deberia estar en el root? (Ahora no se ve cuando se hace ls)
 32. Cuando se ejectuta el comando top, mostrar una sugerencia de como ejecutar un proceso en paralelo para probar el uso del sistema
 33. Quiza tener dos opciones para ver los proyectos sea redundante.
-34. 
+34. El comando matrix, se acumulan caracteres en la ultima linea y un poco salta el scroll en la terminal mientras ejecuta. Se podria mejorar
