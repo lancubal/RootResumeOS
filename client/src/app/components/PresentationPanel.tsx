@@ -34,12 +34,12 @@ export function PresentationPanel() {
                     {/* Circular avatar */}
                     <motion.div
                         className="relative shrink-0 w-24 h-24 lg:w-28 lg:h-28 cursor-pointer"
-                        whileHover={{ scale: 1.07, rotate: 4 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 18 }}>
+                        whileHover={{ scale: 1.12, rotate: -6 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 14 }}>
                         <motion.div
                             className="w-full h-full rounded-full overflow-hidden shadow-lg"
-                            whileHover={{ boxShadow: "0 0 0 5px #a1a1aa, 0 8px 24px rgba(0,0,0,0.18)" }}
-                            transition={{ duration: 0.2 }}>
+                            whileHover={{ boxShadow: "0 0 0 3px #6366f1, 0 0 28px rgba(99,102,241,0.5), 0 12px 32px rgba(0,0,0,0.25)" }}
+                            transition={{ duration: 0.22 }}>
                             <Image
                                 src="/avatar.jpg"
                                 alt={OWNER.name}
@@ -67,12 +67,16 @@ export function PresentationPanel() {
                                         key={i}
                                         variants={{
                                             hover: {
-                                                y: char === " " ? 0 : -6,
-                                                color: char === " " ? "inherit" : ["#18181b", "#6366f1", "#18181b"],
-                                                transition: { delay: i * 0.03, duration: 0.3, type: "spring", stiffness: 400, damping: 15 },
+                                                y: char === " " ? 0 : -7,
+                                                color: char === " " ? "#18181b" : "#6366f1",
+                                                transition: {
+                                                    y: { type: "spring", stiffness: 420, damping: 14, delay: i * 0.03 },
+                                                    color: { type: "tween", duration: 0.18, delay: i * 0.03 },
+                                                },
                                             },
                                         }}
-                                        className="inline-block bg-gradient-to-r from-zinc-900 to-zinc-600 bg-clip-text text-transparent">
+                                        style={{ color: "#18181b" }}
+                                        className="inline-block">
                                         {char === " " ? "\u00a0" : char}
                                     </motion.span>
                                 ))}

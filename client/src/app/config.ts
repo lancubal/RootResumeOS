@@ -388,9 +388,9 @@ export const USES = [
     category: 'Hardware',
     icon: '💻',
     items: [
-      { name: 'MacBook Pro M2', description: '16" — absurd battery life. Best dev machine I\'ve used.' },
-      { name: 'LG 27" 4K', description: 'External monitor. IPS panel. Great for code density.' },
-      { name: 'Keychron K2 V2', description: 'Mechanical keyboard. Gateron Brown switches.' },
+      { name: 'ThinkPad T14', description: 'Daily driver. Solid Linux compatibility, great keyboard.' },
+      { name: 'Samsung Odyssey G5', description: 'Curved gaming monitor. Smooth for both code and everything else.' },
+      { name: 'Ultimate Hacking Keyboard', description: 'Split mechanical keyboard. Programmable, modular, built to last.' },
       { name: 'Logitech MX Master 3', description: 'Mouse. The scroll wheel alone is worth it.' },
     ],
   },
