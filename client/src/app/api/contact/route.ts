@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export const dynamic = 'force-dynamic';
+
 const TO_EMAIL = process.env.CONTACT_TO_EMAIL ?? 'lunalancuba.sistemas@gmail.com';
 
 export async function POST(req: NextRequest) {
+  const resend = new Resend(process.env.RESEND_API_KEY);
   try {
     const { name, email, message } = await req.json();
 

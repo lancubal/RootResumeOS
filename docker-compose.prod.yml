@@ -1,0 +1,46 @@
+version: '3.8'
+
+# Production docker-compose — uses pre-built images from Amazon ECR.
+# On EC2, set ECR_REGISTRY in a .env file or shell environment.
+# Example: ECR_REGISTRY=123456789012.dkr.ecr.us-east-1.amazonaws.com
+
+services:
+  proxy:
+    image: nginx:1.25-alpine
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    networks:
+      - portfolio-net
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+  frontend:
+    image: ${ECR_REGISTRY}/rootresume/frontend:latest
+    environment:
+      RESEND_API_KEY: ${RESEND_API_KEY}
+    volumes:
+      - visitor-data:/app/.data
+    networks:
+      - portfolio-net
+    restart: unless-stopped
+
+  backend:
+    image: ${ECR_REGISTRY}/rootresume/backend:latest
+    environment:
+      HOST: '0.0.0.0'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - portfolio-net
+    restart: unless-stopped
+
+networks:
+  portfolio-net:
+    driver: bridge
+
+volumes:
+  visitor-data:

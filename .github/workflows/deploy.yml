@@ -1,0 +1,122 @@
+name: Build & Deploy to ECR + EC2
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  id-token: write   # required for OIDC
+  contents: read
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      registry: ${{ steps.login-ecr.outputs.registry }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push frontend
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE=$REGISTRY/rootresume/frontend
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=/api \
+            -f client/Dockerfile.prod \
+            -t $IMAGE:latest \
+            -t $IMAGE:${{ github.sha }} \
+            ./client
+          docker push $IMAGE:latest
+          docker push $IMAGE:${{ github.sha }}
+
+      - name: Build and push backend
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE=$REGISTRY/rootresume/backend
+          docker build \
+            -f server/Dockerfile.prod \
+            -t $IMAGE:latest \
+            -t $IMAGE:${{ github.sha }} \
+            ./server
+          docker push $IMAGE:latest
+          docker push $IMAGE:${{ github.sha }}
+
+      - name: Build and push portfolio-runner
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE=$REGISTRY/rootresume/portfolio-runner
+          docker build \
+            -f server/Dockerfile \
+            -t $IMAGE:latest \
+            -t $IMAGE:${{ github.sha }} \
+            ./server
+          docker push $IMAGE:latest
+          docker push $IMAGE:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy compose + nginx config to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "docker-compose.prod.yml,nginx/nginx.conf"
+          target: ~/rootresume
+          strip_components: 0
+
+      - name: Deploy on EC2 via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: AWS_REGION,ECR_REGISTRY
+          script: |
+            set -e
+            cd ~/rootresume
+
+            # Login to ECR (EC2 role handles auth, no need for credentials)
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
+              | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+            # Pull portfolio-runner to host Docker daemon (used as sibling container)
+            docker pull ${{ secrets.ECR_REGISTRY }}/rootresume/portfolio-runner:latest
+            # Re-tag as 'portfolio-runner' (name the backend uses in docker run)
+            docker tag \
+              ${{ secrets.ECR_REGISTRY }}/rootresume/portfolio-runner:latest \
+              portfolio-runner:latest
+
+            # Pull latest images and restart
+            ECR_REGISTRY=${{ secrets.ECR_REGISTRY }} \
+            RESEND_API_KEY=${{ secrets.RESEND_API_KEY }} \
+            docker compose \
+              -f docker-compose.prod.yml pull
+            ECR_REGISTRY=${{ secrets.ECR_REGISTRY }} \
+            RESEND_API_KEY=${{ secrets.RESEND_API_KEY }} \
+            docker compose \
+              -f docker-compose.prod.yml up -d --remove-orphans
+
+            # Cleanup old images
+            docker image prune -f
