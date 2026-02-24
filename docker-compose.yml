@@ -26,6 +26,8 @@ services:
         NEXT_PUBLIC_API_URL: /api
     # The frontend is no longer exposed directly to the host.
     # All traffic goes through the 'proxy' service.
+    volumes:
+      - visitor-data:/app/.data
     networks:
       - portfolio-net
 
@@ -46,3 +48,6 @@ services:
 networks:
   portfolio-net:
     driver: bridge
+
+volumes:
+  visitor-data:

@@ -49,51 +49,53 @@ function PostCard({
     index: number;
 }) {
     return (
-        <motion.article
-            key={post.id}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97 }}
-            transition={{ duration: 0.3, delay: index * 0.05 }}
-            layout
-            className="group bg-white rounded-2xl border border-zinc-100 shadow-sm p-7 flex flex-col gap-4 hover:shadow-md transition-shadow cursor-pointer">
-            {/* Meta row */}
-            <div className="flex items-center gap-3 text-xs text-zinc-400">
-                <span>{formatDate(post.date)}</span>
-                <span>·</span>
-                <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {post.readTime} min read
-                </span>
-            </div>
-
-            {/* Title */}
-            <h2 className="text-xl font-bold text-zinc-900 leading-snug group-hover:text-rose-600 transition-colors">
-                {post.title}
-            </h2>
-
-            {/* Summary */}
-            <p className="text-zinc-600 text-sm leading-relaxed">
-                {post.summary}
-            </p>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-1.5 pt-1">
-                {post.tags.map((tag) => (
-                    <span
-                        key={tag}
-                        className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-xs font-medium">
-                        <TagIcon className="w-2.5 h-2.5" />
-                        {tag}
+        <Link href={`/blog/${post.slug}`}>
+            <motion.article
+                key={post.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                layout
+                className="group bg-white rounded-2xl border border-zinc-100 shadow-sm p-7 flex flex-col gap-4 hover:shadow-md transition-shadow cursor-pointer">
+                {/* Meta row */}
+                <div className="flex items-center gap-3 text-xs text-zinc-400">
+                    <span>{formatDate(post.date)}</span>
+                    <span>·</span>
+                    <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {post.readTime} min read
                     </span>
-                ))}
-            </div>
+                </div>
 
-            {/* Read more hint */}
-            <div className="text-xs text-zinc-400 group-hover:text-rose-500 transition-colors font-medium pt-1 border-t border-zinc-50">
-                Read article →
-            </div>
-        </motion.article>
+                {/* Title */}
+                <h2 className="text-xl font-bold text-zinc-900 leading-snug group-hover:text-rose-600 transition-colors">
+                    {post.title}
+                </h2>
+
+                {/* Summary */}
+                <p className="text-zinc-600 text-sm leading-relaxed">
+                    {post.summary}
+                </p>
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                    {post.tags.map((tag) => (
+                        <span
+                            key={tag}
+                            className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 text-xs font-medium">
+                            <TagIcon className="w-2.5 h-2.5" />
+                            {tag}
+                        </span>
+                    ))}
+                </div>
+
+                {/* Read more hint */}
+                <div className="text-xs text-zinc-400 group-hover:text-rose-500 transition-colors font-medium pt-1 border-t border-zinc-50">
+                    Read article →
+                </div>
+            </motion.article>
+        </Link>
     );
 }
 
@@ -208,8 +210,7 @@ export default function BlogPage() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 }}
                     className="text-center text-zinc-300 text-xs mt-16">
-                    Full articles coming soon — these are previews of upcoming
-                    posts.
+                    More articles on the way.
                 </motion.p>
             </main>
         </div>

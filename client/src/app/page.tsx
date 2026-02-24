@@ -1,23 +1,60 @@
 "use client";
 
-import { useState } from "react";
-import { Terminal as TerminalIcon, X } from "lucide-react";
-import { QUICK_COMMANDS } from "./config";
+import { useState, useEffect, useCallback } from "react";
+import {
+    Terminal as TerminalIcon,
+    X,
+    Github,
+    Linkedin,
+    Mail,
+} from "lucide-react";
+import { QUICK_COMMANDS, OWNER } from "./config";
 import { motion, AnimatePresence } from "motion/react";
 import { PresentationPanel } from "./components/PresentationPanel";
 import RootResumeTerminal from "./RootResumeTerminal";
 
+const KONAMI = [
+    "ArrowUp",
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight",
+    "ArrowLeft",
+    "ArrowRight",
+    "b",
+    "a",
+];
+
 export default function Home() {
     const [currentCommand, setCurrentCommand] = useState("");
     const [isTerminalOpen, setIsTerminalOpen] = useState(false);
+    const [konamiBuffer, setKonamiBuffer] = useState<string[]>([]);
 
     const handleCommandClick = (command: string) => {
         setCurrentCommand(command);
-        if (window.innerWidth < 1024) {
-            setIsTerminalOpen(true);
-        }
-        // currentCommand is cleared by the terminal via onCommandExecuted
+        if (window.innerWidth < 1024) setIsTerminalOpen(true);
     };
+
+    const handleKonamiKey = useCallback((e: KeyboardEvent) => {
+        setKonamiBuffer((prev) => {
+            const next = [...prev, e.key].slice(-KONAMI.length);
+            if (next.join(",") === KONAMI.join(",")) {
+                setCurrentCommand("konami");
+                if (window.innerWidth < 1024) setIsTerminalOpen(true);
+                return [];
+            }
+            return next;
+        });
+    }, []);
+
+    useEffect(() => {
+        window.addEventListener("keydown", handleKonamiKey);
+        return () => window.removeEventListener("keydown", handleKonamiKey);
+    }, [handleKonamiKey]);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _ = konamiBuffer; // consumed via closure
 
     return (
         <div
@@ -45,12 +82,12 @@ export default function Home() {
                         />
                     </div>
                     {/* Quick Actions */}
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 px-6">
                         <div className="text-xs text-zinc-500 mb-2 uppercase tracking-widest flex items-center gap-2">
                             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                             Quick Actions
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex justify-between gap-2">
                             {QUICK_COMMANDS.map((cmd, index) => (
                                 <motion.button
                                     key={index}
@@ -74,18 +111,47 @@ export default function Home() {
 
             {/* ── Mobile: panel + floating button ── */}
             <div className="lg:hidden h-full flex flex-col">
-                <div className="flex-1 overflow-y-auto pb-24">
+                <div className="flex-1 overflow-y-auto pb-20">
                     <PresentationPanel />
                 </div>
 
-                {/* Floating terminal button */}
-                <motion.button
-                    onClick={() => setIsTerminalOpen(true)}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-zinc-800 to-zinc-900 text-white rounded-full shadow-2xl flex items-center justify-center z-40">
-                    <TerminalIcon className="w-6 h-6" />
-                </motion.button>
+                {/* Fixed bottom bar: social icons (left) + terminal button (right) */}
+                <div
+                    className="fixed bottom-0 inset-x-0 h-20 flex items-center justify-between px-6 z-40 lg:hidden"
+                    style={{ backgroundColor: "#f6f6f7" }}>
+                    <div className="flex items-center gap-5">
+                        <a
+                            href={OWNER.social.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="GitHub"
+                            className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
+                            <Github className="w-5 h-5 text-zinc-600" />
+                        </a>
+                        <a
+                            href={OWNER.social.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="LinkedIn"
+                            className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
+                            <Linkedin className="w-5 h-5 text-zinc-600" />
+                        </a>
+                        <a
+                            href={`mailto:${OWNER.social.email}`}
+                            aria-label="Email"
+                            className="w-11 h-11 rounded-full bg-zinc-100 hover:bg-zinc-200 flex items-center justify-center transition-colors">
+                            <Mail className="w-5 h-5 text-zinc-600" />
+                        </a>
+                    </div>
+                    <motion.button
+                        onClick={() => setIsTerminalOpen(true)}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-zinc-800 to-zinc-900 text-white rounded-full shadow-lg text-sm font-medium">
+                        <TerminalIcon className="w-5 h-5" />
+                        <span>Terminal</span>
+                    </motion.button>
+                </div>
 
                 {/* Slide-up drawer */}
                 <AnimatePresence>
@@ -123,7 +189,7 @@ export default function Home() {
                                         />
                                     </div>
                                     {/* Quick Actions in mobile drawer */}
-                                    <div className="flex-shrink-0 flex flex-wrap gap-2">
+                                    <div className="flex-shrink-0 flex justify-between gap-2">
                                         {QUICK_COMMANDS.map((cmd, index) => (
                                             <motion.button
                                                 key={index}
