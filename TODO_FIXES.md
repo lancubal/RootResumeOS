@@ -29,10 +29,10 @@
 ~~30. El comando ls muestra Desktop, Downloads y Docuemnts. Es correcto esto?~~ [done] ls muestra home directories correctas.
 ~~31. el archivo about-me.md deberia estar en el root? (Ahora no se ve cuando se hace ls)~~ [done] about-me.md movido al root; visible en ls.
 ~~32. Cuando se ejectuta el comando top, mostrar una sugerencia de como ejecutar un proceso en paralelo para probar el uso del sistema~~ [done] top muestra tip para ejecutar un proceso en paralelo.
-33. Quiza tener dos opciones para ver los proyectos sea redundante.
-34. El comando matrix, se acumulan caracteres en la ultima linea y un poco salta el scroll en la terminal mientras ejecuta. Se podria mejorar
-35. Modo noche (automatico quiza?)
-36. Creo que se rompio el numero de visitas
+~~33. Quiza tener dos opciones para ver los proyectos sea redundante.~~ [done] Botón "My Projects" reemplazado por 🥠 Fortune; botones en fila equiespaciada con px-6 de margen.
+~~34. El comando matrix, se acumulan caracteres en la ultima linea y un poco salta el scroll en la terminal mientras ejecuta. Se podria mejorar~~ [done] Scroll estabilizado, caracteres ya no se acumulan en la última línea.
+~~35. Modo noche (automatico quiza?)~~ [descartado] Implementación completa revertida (globals.css + layout.tsx + sub-pages) por incompatibilidad que rompía el frontend.
+~~36. Creo que se rompio el numero de visitas~~ [done] Usuario nextjs sin permisos para crear /app/.data; corregido con mkdir+chown en Dockerfile.prod, volumen persistente visitor-data en docker-compose, route marcada force-dynamic.
 37. Sumar y ordenar proyectos en Projects y "My Projects"
 
 24. Probar las challenges
