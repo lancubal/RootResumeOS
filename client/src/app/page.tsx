@@ -174,10 +174,10 @@ export default function Home() {
                                     stiffness: 300,
                                 }}
                                 className="fixed inset-x-0 bottom-0 h-[75vh] z-50">
-                                <div className="h-full flex flex-col gap-2 p-3 bg-zinc-950">
+                                <div className="relative h-full flex flex-col gap-2 p-3 bg-zinc-950">
                                     <button
                                         onClick={() => setIsTerminalOpen(false)}
-                                        className="absolute top-5 right-5 w-9 h-9 bg-zinc-700 text-white rounded-full flex items-center justify-center z-10 shadow-lg">
+                                        className="absolute top-4 right-4 w-9 h-9 bg-zinc-700 hover:bg-zinc-600 text-white rounded-full flex items-center justify-center z-10 shadow-lg">
                                         <X className="w-4 h-4" />
                                     </button>
                                     <div className="flex-1 min-h-0">
