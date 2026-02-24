@@ -237,7 +237,7 @@ export default function RootResumeTerminal({
                             type: "output",
                         },
                         {
-                            text: "------------------------------------------------------------------",
+                            text: "────────────────────────────────",
                             type: "output",
                         },
                         { text: "", type: "output" },
