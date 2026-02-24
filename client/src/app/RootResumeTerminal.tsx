@@ -691,6 +691,10 @@ export default function RootResumeTerminal({
                 list.forEach((c: any) =>
                     pushToHistory(`${c.id}. ${c.name} - ${c.description}`),
                 );
+                pushToHistory(
+                    "\nTo start a challenge, run: start <number>\nExample: start 1",
+                    "info",
+                );
             } catch (e) {
                 pushToHistory("Error fetching challenges.", "error");
             }
