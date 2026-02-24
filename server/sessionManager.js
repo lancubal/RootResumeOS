@@ -59,8 +59,8 @@ class SessionManager {
                 const containerId = stdout.trim();
                 const now = Date.now();
                 
-                // Create a more traditional Linux home directory structure
-                const setupDirsCommand = `docker exec ${containerName} sh -c "mkdir -p /home/guest && cd /home/guest && mkdir .config .local .ssh Desktop Documents Downloads"`;
+                // Create a developer-themed Linux home directory structure
+                const setupDirsCommand = `docker exec ${containerName} sh -c "mkdir -p /home/guest && cd /home/guest && mkdir -p projects docs scripts .config .local .ssh && touch about-me.md"`;
                 exec(setupDirsCommand);
 
                 this.sessions.set(sessionId, {

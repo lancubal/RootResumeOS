@@ -909,6 +909,10 @@ export default function RootResumeTerminal({
                     "Starting 'top' command. Press Ctrl+C to stop.",
                     "header",
                 );
+                pushToHistory(
+                    "Tip: run a heavy process in another tab (e.g. visualize quicksort &) to see CPU spike.",
+                    "info",
+                );
                 pushToHistory("CPU %\tMEM USAGE\tNET I/O\tBLOCK I/O", "info");
                 setHistory((prev) => [
                     ...prev,
