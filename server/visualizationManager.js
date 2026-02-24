@@ -399,6 +399,7 @@ const VISUALIZATIONS = {
             "    '  ══════════════════════════════════════\\n'",
             ")",
             "sys.stdout.flush()",
+            "time.sleep(0.5)",
         ].join("\n"),
     },
     maze: {

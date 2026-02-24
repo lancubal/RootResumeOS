@@ -867,6 +867,17 @@ export default function RootResumeTerminal({
                 }
             } else if (command.startsWith("visualize ")) {
                 const vizId = command.split(" ")[1];
+                const validVizIds = ["bubble", "selection", "quick", "pathfinder", "dfs", "life", "mandelbrot", "montecarlo", "maze"];
+                if (!validVizIds.includes(vizId)) {
+                    pushToHistory(`Unknown visualization: "${vizId}"`, "error");
+                    pushToHistory("");
+                    pushToHistory("Available visualizations:");
+                    validVizIds.forEach((v) => pushToHistory(`  visualize ${v}`));
+                    pushToHistory("");
+                    setIsLoading(false);
+                    setTimeout(() => inputRef.current?.focus(), 10);
+                    return;
+                }
                 if (streamRef.current) streamRef.current.close();
 
                 const pythonViz = ["life", "mandelbrot", "montecarlo", "maze"];
