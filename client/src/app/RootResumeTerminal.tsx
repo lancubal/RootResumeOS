@@ -555,11 +555,11 @@ export default function RootResumeTerminal({
             setTimeout(() => inputRef.current?.focus(), 10);
         } else if (command === "konami") {
             const lines = [
-                "  ##   ##  ##   ##  ##      ####   ##    ## ####### ##",
-                "  ##   ##  ###  ##  ##     ##  ##  ## # ## ##      ##",
-                "  ##   ##  ## # ##  ##     ##  ##  ##   ## #####   ##",
-                "  ##   ##  ##  ###  ##     ##  ##  ##   ## ##      ##",
-                "   #####   ##   ##  ######  ####   ##   ## ####### ##",
+                "  ##  ##   ####   ##  ##   ####   ##   ##  ######",
+                "  ## ##   ##  ##  ### ##  ##  ##  ### ###    ##  ",
+                "  #####   ##  ##  ## ###  ######  ## # ##    ##  ",
+                "  ## ##   ##  ##  ##  ##  ##  ##  ##   ##    ##  ",
+                "  ##  ##   ####   ##  ##  ##  ##  ##   ##  ######",
             ];
             pushToHistory("");
             lines.forEach((l) => pushToHistory(l, "header"));
@@ -942,14 +942,19 @@ export default function RootResumeTerminal({
             <div
                 className="relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-lg border border-zinc-800 bg-black shadow-2xl font-mono text-sm"
                 onClick={handleTerminalClick}>
-                <div className={`flex items-center gap-2 border-b border-zinc-800 px-4 py-2 ${crtMode ? "bg-zinc-950" : "bg-gray-800"}`}>
+                <div
+                    className={`flex items-center gap-2 border-b border-zinc-800 px-4 py-2 ${crtMode ? "bg-zinc-950" : "bg-gray-800"}`}>
                     <div className="flex-1" />
-                    <div className={`text-sm font-bold ${crtMode ? "text-green-400" : "text-zinc-400"}`}>
+                    <div
+                        className={`text-sm font-bold ${crtMode ? "text-green-400" : "text-zinc-400"}`}>
                         {username}@RootResume: {cwd}
                     </div>
                     <div className="flex-1 flex justify-end">
                         <button
-                            onClick={(e) => { e.stopPropagation(); setCrtMode(p => !p); }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setCrtMode((p) => !p);
+                            }}
                             title="Toggle CRT mode"
                             className={`p-1.5 rounded transition-colors ${crtMode ? "text-green-400 bg-green-900/30 hover:bg-green-900/50" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-700"}`}>
                             <Tv2 className="w-4 h-4" />
@@ -961,13 +966,21 @@ export default function RootResumeTerminal({
                         aria-hidden="true"
                         className="pointer-events-none absolute inset-0 z-10 rounded-lg overflow-hidden"
                         style={{
-                            background: "repeating-linear-gradient(to bottom, transparent 0px, transparent 1px, rgba(0,0,0,0.18) 1px, rgba(0,0,0,0.18) 2px)",
+                            background:
+                                "repeating-linear-gradient(to bottom, transparent 0px, transparent 1px, rgba(0,0,0,0.18) 1px, rgba(0,0,0,0.18) 2px)",
                         }}
                     />
                 )}
                 <div
                     className="flex-1 overflow-y-auto overflow-x-hidden p-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent"
-                    style={crtMode ? { textShadow: "0 0 5px rgba(0,255,80,0.6), 0 0 2px rgba(0,255,80,0.9)" } : undefined}>
+                    style={
+                        crtMode
+                            ? {
+                                  textShadow:
+                                      "0 0 5px rgba(0,255,80,0.6), 0 0 2px rgba(0,255,80,0.9)",
+                              }
+                            : undefined
+                    }>
                     {isInitializing && (
                         <div className="animate-pulse text-green-500">
                             Booting RootResume OS...
@@ -978,7 +991,8 @@ export default function RootResumeTerminal({
                             key={i}
                             className="whitespace-pre-wrap break-words leading-relaxed mb-1">
                             {item.type === "cmd" ? (
-                                <div className={`font-bold ${crtMode ? "text-green-300" : "text-green-400"}`}>
+                                <div
+                                    className={`font-bold ${crtMode ? "text-green-300" : "text-green-400"}`}>
                                     <span className="shrink-0">
                                         {item.username || username}@RootResume:
                                         {item.cwd || "~"}${" "}
@@ -1015,7 +1029,8 @@ export default function RootResumeTerminal({
                         <form
                             onSubmit={handleSubmit}
                             className="flex items-center">
-                            <span className={`mr-2 shrink-0 ${crtMode ? "text-green-400" : "text-green-500"}`}>
+                            <span
+                                className={`mr-2 shrink-0 ${crtMode ? "text-green-400" : "text-green-500"}`}>
                                 {username}@RootResume:{cwd}$
                             </span>
                             <input

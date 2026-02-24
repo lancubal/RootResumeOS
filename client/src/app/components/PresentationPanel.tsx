@@ -217,7 +217,8 @@ export function PresentationPanel() {
 
                 {visitors !== null && (
                     <span className="text-xs text-zinc-400">
-                        {visitors.toLocaleString()} visit{visitors === 1 ? "" : "s"}
+                        {visitors.toLocaleString()} visit
+                        {visitors === 1 ? "" : "s"}
                     </span>
                 )}
             </motion.div>

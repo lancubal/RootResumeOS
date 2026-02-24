@@ -1,7 +1,7 @@
 # ✅ RootResume OS — Test Plan
 
-> **Branch**: `experimental`  
-> **Date**: February 2026  
+> **Branch**: `experimental`
+> **Date**: February 2026
 > **How to run**: `cd client && npm run dev` (port 3000) + `cd server && node index.js` (port 3001, requires Docker)
 
 ---
