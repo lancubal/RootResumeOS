@@ -537,19 +537,16 @@ export default function RootResumeTerminal({
             setTimeout(() => inputRef.current?.focus(), 10);
         } else if (command === "?") {
             const lines = [
-                "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510",
-                "\u2502          KEYBOARD SHORTCUTS           \u2502",
-                "\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524",
-                "\u2502  \u2191 / \u2193        Navigate history        \u2502",
-                "\u2502  Tab          Autocomplete             \u2502",
-                "\u2502  Enter        Submit command           \u2502",
-                "\u2502  Ctrl+C       Interrupt stream         \u2502",
-                "\u2502  Ctrl+L       Clear terminal           \u2502",
-                "\u2502  \u2191\u2191\u2193\u2193\u2190\u2192\u2190\u2192BA   ???                     \u2502",
-                "\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+                "Keyboard Shortcuts:",
+                "  ↑ / ↓        Navigate command history",
+                "  Tab          Autocomplete command or path",
+                "  Enter        Submit command",
+                "  Ctrl+C       Interrupt running stream",
+                "  Ctrl+L       Clear terminal",
+                "  ↑↑↓↓←→←→BA  ???",
             ];
             pushToHistory("");
-            lines.forEach((l) => pushToHistory(l, "info"));
+            lines.forEach((l) => pushToHistory(l));
             pushToHistory("");
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
