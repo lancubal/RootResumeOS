@@ -867,12 +867,24 @@ export default function RootResumeTerminal({
                 }
             } else if (command.startsWith("visualize ")) {
                 const vizId = command.split(" ")[1];
-                const validVizIds = ["bubble", "selection", "quick", "pathfinder", "dfs", "life", "mandelbrot", "montecarlo", "maze"];
+                const validVizIds = [
+                    "bubble",
+                    "selection",
+                    "quick",
+                    "pathfinder",
+                    "dfs",
+                    "life",
+                    "mandelbrot",
+                    "montecarlo",
+                    "maze",
+                ];
                 if (!validVizIds.includes(vizId)) {
                     pushToHistory(`Unknown visualization: "${vizId}"`, "error");
                     pushToHistory("");
                     pushToHistory("Available visualizations:");
-                    validVizIds.forEach((v) => pushToHistory(`  visualize ${v}`));
+                    validVizIds.forEach((v) =>
+                        pushToHistory(`  visualize ${v}`),
+                    );
                     pushToHistory("");
                     setIsLoading(false);
                     setTimeout(() => inputRef.current?.focus(), 10);
@@ -1051,12 +1063,7 @@ export default function RootResumeTerminal({
                 onClick={handleTerminalClick}>
                 <div
                     className={`flex items-center gap-2 border-b border-zinc-800 px-4 py-2 ${crtMode ? "bg-zinc-950" : "bg-gray-800"}`}>
-                    <div className="flex-1" />
-                    <div
-                        className={`text-sm font-bold ${crtMode ? "text-green-400" : "text-zinc-400"}`}>
-                        {username}@RootResume: {cwd}
-                    </div>
-                    <div className="flex-1 flex justify-end">
+                    <div className="flex-1 flex justify-start">
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -1067,6 +1074,11 @@ export default function RootResumeTerminal({
                             <Tv2 className="w-4 h-4" />
                         </button>
                     </div>
+                    <div
+                        className={`text-sm font-bold ${crtMode ? "text-green-400" : "text-zinc-400"}`}>
+                        {username}@RootResume: {cwd}
+                    </div>
+                    <div className="flex-1" />
                 </div>
                 {crtMode && (
                     <div
