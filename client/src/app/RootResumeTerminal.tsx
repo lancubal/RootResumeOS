@@ -377,7 +377,35 @@ export default function RootResumeTerminal({
         } else if (e.key === "Tab") {
             e.preventDefault();
 
-            if (input.includes(" ")) {
+            const VIZ_IDS = [
+                "bubble",
+                "selection",
+                "quick",
+                "pathfinder",
+                "dfs",
+                "life",
+                "mandelbrot",
+                "montecarlo",
+                "maze",
+            ];
+
+            if (input.startsWith("visualize ")) {
+                // Visualize subcommand completion
+                const partial = input.slice("visualize ".length);
+                const matches = VIZ_IDS.filter((id) => id.startsWith(partial));
+                if (matches.length === 1) {
+                    setInput(`visualize ${matches[0]}`);
+                } else if (matches.length > 1) {
+                    setHistory((prev) => [
+                        ...prev,
+                        { text: input, type: "cmd", cwd: cwd, username: username },
+                    ]);
+                    setHistory((prev) => [
+                        ...prev,
+                        { text: matches.join("\t"), type: "output" },
+                    ]);
+                }
+            } else if (input.includes(" ")) {
                 // Path completion
                 const parts = input.trim().split(" ");
                 const partialPath = parts[parts.length - 1];

@@ -132,6 +132,7 @@ app.get("/stream", async (req, res) => {
         res.setHeader("Content-Type", "text/event-stream");
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
+        res.setHeader("X-Accel-Buffering", "no");
         const child = sessionManager.spawnCommand(sessionId, executable);
         child.stdout.on("data", (chunk) =>
             res.write(`data: ${chunk.toString("base64")}\n\n`),
@@ -159,6 +160,7 @@ app.get("/stats", async (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
     let intervalId;
     try {
         const containerName = sessionManager.sessions.get(sessionId).name;
