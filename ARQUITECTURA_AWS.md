@@ -138,16 +138,23 @@ location /mi-app/ {
 services:
   mi-app-web:
     image: ${ECR_REGISTRY}/rootresume/mi-app-web:latest
+    profiles: ["mi-app"]   # evita que el workflow de rootresume intente pullear esta imagen
     networks:
       - portfolio-net
     restart: unless-stopped
 
   mi-app-api:
     image: ${ECR_REGISTRY}/rootresume/mi-app-api:latest
+    profiles: ["mi-app"]
     networks:
       - portfolio-net
     restart: unless-stopped
 ```
+
+> Los servicios con `profiles` no son incluidos en `docker compose pull/up` por defecto. Para levantar la sub-app en EC2 se usa:
+> ```bash
+> ECR_REGISTRY=... docker compose -f docker-compose.prod.yml --profile mi-app up -d almorz-web almorz-api
+> ```
 
 ### 3. ECR — crear los repositorios
 
