@@ -18,6 +18,8 @@ services:
     depends_on:
       - frontend
       - backend
+      - almorz-web
+      - almorz-api
     restart: unless-stopped
 
   frontend:
@@ -39,6 +41,20 @@ services:
     networks:
       - portfolio-net
     restart: unless-stopped
+
+  almorz-web:
+    image: ${ECR_REGISTRY}/almorz/web:latest
+    restart: unless-stopped
+    networks:
+      - portfolio-net
+
+  almorz-api:
+    image: ${ECR_REGISTRY}/almorz/api:latest
+    restart: unless-stopped
+    volumes:
+      - /srv/almorz/db.json:/app/db.json   # persistencia en el host
+    networks:
+      - portfolio-net
 
 networks:
   portfolio-net:
