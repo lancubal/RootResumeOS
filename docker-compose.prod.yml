@@ -42,15 +42,15 @@ services:
 
   almorz-web:
     image: ${ECR_REGISTRY}/almorz/web:latest
-    restart: unless-stopped
     profiles: ["almorz"]
+    restart: unless-stopped
     networks:
       - portfolio-net
 
   almorz-api:
     image: ${ECR_REGISTRY}/almorz/api:latest
-    restart: unless-stopped
     profiles: ["almorz"]
+    restart: unless-stopped
     volumes:
       - /srv/almorz/db.json:/app/db.json   # persistencia en el host
     networks:
@@ -58,6 +58,7 @@ services:
 
 networks:
   portfolio-net:
+    driver: bridge
     driver: bridge
 
 volumes:
