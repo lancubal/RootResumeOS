@@ -59,7 +59,6 @@ services:
 networks:
   portfolio-net:
     driver: bridge
-    driver: bridge
 
 volumes:
   visitor-data:
