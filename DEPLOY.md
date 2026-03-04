@@ -154,3 +154,145 @@ El paso final es ejecutar la aplicación usando las imágenes de ECR.
         ```
 
 ¡Tu aplicación ahora está desplegada en producción, con un flujo de CI/CD completamente funcional!
+
+---
+
+## Paso 5: Agregar una Sub-App bajo un Path (`/nombre/`)
+
+Este es el proceso para montar una aplicación independiente bajo una ruta del dominio principal (ej. `luna-lancuba.dev/almorzar/`). La sub-app tiene su propio repositorio, su propio pipeline de CI/CD y sus propias imágenes en ECR, pero comparte el nginx proxy y la red Docker de rootresume.
+
+### 5.1 — Crear los repositorios en ECR
+
+En la consola de AWS ECR, crear dos repositorios privados para la nueva app:
+- `mi-app/web`
+- `mi-app/api` (si la app tiene backend propio)
+
+### 5.2 — Configurar el IAM Trust Policy para el nuevo repo
+
+El rol IAM `GitHubActions_ECR_Access` necesita autorizar el repo de la nueva app. En la consola de AWS:
+
+**IAM → Roles → `GitHubActions_ECR_Access` → Trust relationships → Edit trust policy**
+
+Agregar el repo al array `sub`:
+```json
+"token.actions.githubusercontent.com:sub": [
+    "repo:lancubal/RootResumeOS:ref:refs/heads/master",
+    "repo:lancubal/mi-app:ref:refs/heads/main"
+]
+```
+
+> **Ojo con mayúsculas/minúsculas**: el nombre del repo debe coincidir exactamente con el de GitHub (ej. `RootResumeOS`, no `rootresume`).
+
+### 5.3 — Agregar los servicios en `docker-compose.prod.yml`
+
+Agregar los servicios con `profiles` para que el workflow de rootresume no intente pullear estas imágenes:
+
+```yaml
+services:
+  mi-app-web:
+    image: ${ECR_REGISTRY}/mi-app/web:latest
+    profiles: ["mi-app"]
+    restart: unless-stopped
+    networks:
+      - portfolio-net
+
+  mi-app-api:
+    image: ${ECR_REGISTRY}/mi-app/api:latest
+    profiles: ["mi-app"]
+    restart: unless-stopped
+    volumes:
+      - /srv/mi-app/db.json:/app/db.json   # persistencia en el host (si aplica)
+    networks:
+      - portfolio-net
+```
+
+> Los servicios con `profiles` son ignorados por el `docker compose pull/up` estándar del workflow de rootresume.
+
+### 5.4 — Agregar las rutas en `nginx/nginx.conf`
+
+En el bloque `http {}`, agregar los upstreams:
+```nginx
+upstream mi-app-api {
+    server mi-app-api:3001;
+}
+upstream mi-app-web {
+    server mi-app-web:80;
+}
+```
+
+En el bloque `server { listen 443 }`, agregar los location blocks **antes** del `location /` catch-all:
+```nginx
+location = /mi-app {
+    return 301 /mi-app/;
+}
+
+location /mi-app/api/ {
+    proxy_pass http://mi-app-api/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+location /mi-app/ {
+    proxy_pass http://mi-app-web/;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+### 5.5 — Configurar la URL de la API en el frontend de la sub-app
+
+El frontend de la sub-app **no debe hardcodear** `http://localhost:3001`. Debe usar rutas relativas que pasen por nginx:
+
+```js
+// ❌ Nunca hacer esto — localhost apunta al browser del visitante
+fetch('http://localhost:3001/api/users')
+
+// ✅ Correcto — va por nginx → mi-app-api
+fetch('/mi-app/api/users')
+
+// ✅ O con variable de entorno
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '/mi-app/api'
+fetch(`${API_URL}/users`)
+```
+
+### 5.6 — Commitear y pushear a rootresume
+
+```bash
+git add docker-compose.prod.yml nginx/nginx.conf
+git commit -m "feat: add mi-app sub-app (nginx routing + docker-compose services)"
+git push origin master
+```
+
+El workflow de rootresume se encarga de copiar el `nginx.conf` actualizado a EC2 y recrear el proxy automáticamente.
+
+### 5.7 — Preparar el host EC2 (primera vez)
+
+Antes del primer deploy de la sub-app, crear el directorio de persistencia si aplica:
+
+```bash
+sudo mkdir -p /srv/mi-app
+sudo touch /srv/mi-app/db.json
+```
+
+### 5.8 — Levantar los contenedores de la sub-app en EC2
+
+Una vez que las imágenes estén en ECR (pusheadas por el pipeline de la sub-app), levantar los contenedores manualmente o desde el pipeline de la sub-app:
+
+```bash
+cd ~/rootresume
+
+ECR_REGISTRY=<tu-registry> \
+docker compose -f docker-compose.prod.yml --profile mi-app up -d mi-app-web mi-app-api
+```
+
+> Los contenedores se unen automáticamente a la red `rootresume_portfolio-net` y nginx los puede resolver por nombre de servicio.
+
+### Sub-apps actualmente en producción
+
+| Path | Perfil | Web image | API image | Persistencia |
+|---|---|---|---|---|
+| `/almorzar/` | `almorz` | `almorz/web:latest` | `almorz/api:latest` | `/srv/almorz/db.json` |
