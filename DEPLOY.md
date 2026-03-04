@@ -271,12 +271,18 @@ El workflow de rootresume se encarga de copiar el `nginx.conf` actualizado a EC2
 
 ### 5.7 — Preparar el host EC2 (primera vez)
 
-Antes del primer deploy de la sub-app, crear el directorio de persistencia si aplica:
+Antes del primer deploy de la sub-app, crear el directorio de persistencia:
 
 ```bash
 sudo mkdir -p /srv/mi-app
-sudo touch /srv/mi-app/db.json
 ```
+
+> **Nota sobre json-server:** montar un archivo individual (`db.json:/app/db.json`) causa un error `EBUSY on rename` porque json-server usa `steno` que escribe atómicamente via temp-file + `rename()`. Linux no permite `rename()` sobre un inode bind-mounteado. La solución es montar el **directorio** completo y pasarle la ruta al comando:
+> ```yaml
+> command: npx json-server /srv/mi-app/db.json --port 3001 --host 0.0.0.0
+> volumes:
+>   - /srv/mi-app:/srv/mi-app
+> ```
 
 ### 5.8 — Levantar los contenedores de la sub-app en EC2
 
@@ -295,4 +301,4 @@ docker compose -f docker-compose.prod.yml --profile mi-app up -d mi-app-web mi-a
 
 | Path | Perfil | Web image | API image | Persistencia |
 |---|---|---|---|---|
-| `/almorzar/` | `almorz` | `almorz/web:latest` | `almorz/api:latest` | `/srv/almorz/db.json` |
+| `/almorzar/` | `almorz` | `almorz/web:latest` | `almorz/api:latest` | `/srv/almorz` (directorio) |

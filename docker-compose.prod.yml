@@ -51,8 +51,9 @@ services:
     image: ${ECR_REGISTRY}/almorz/api:latest
     profiles: ["almorz"]
     restart: unless-stopped
+    command: npx json-server /srv/almorz/db.json --port 3001 --host 0.0.0.0
     volumes:
-      - /srv/almorz/db.json:/app/db.json   # persistencia en el host
+      - /srv/almorz:/srv/almorz   # directorio completo para evitar inode lock en rename()
     networks:
       - portfolio-net
 
