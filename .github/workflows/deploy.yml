@@ -116,7 +116,7 @@ jobs:
             ECR_REGISTRY=${{ secrets.ECR_REGISTRY }} \
             RESEND_API_KEY=${{ secrets.RESEND_API_KEY }} \
             docker compose \
-              -f docker-compose.prod.yml up -d --remove-orphans
+              -f docker-compose.prod.yml up -d --remove-orphans --force-recreate proxy
 
             # Cleanup old images
             docker image prune -f
