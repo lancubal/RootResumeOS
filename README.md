@@ -100,3 +100,4 @@ Open [http://localhost:3000](http://localhost:3000) to access your Cloud Shell.
 - [x] Network Security Hardening (`--network none`)
 - [ ] AWS EC2 Deployment
 - [ ] Nginx Reverse Proxy & SSL
+- [ ] Blog image support — extend `RichBody` renderer to handle `![alt](url)` syntax (or an `image` field in the content section schema) so blog posts can include screenshots/diagrams

@@ -266,6 +266,42 @@ export const BLOG_POSTS = [
       },
     ],
   },
+  {
+    id: '6',
+    slug: 'almorz-lunch-roulette',
+    title: 'Building a lunch roulette with weighted probability and Angular Signals',
+    summary: 'How I built Almorz.ar — a wheel that decides where to go for lunch using a smart weighting algorithm that factors in ratings, cost, and how long it\'s been since your last visit.',
+    date: '2026-03-04',
+    readTime: 7,
+    tags: ['Angular', 'algorithms', 'json-server', 'Docker', 'side-project'],
+    published: true,
+    content: [
+      {
+        heading: 'The problem: decision fatigue at noon',
+        body: `Every day at lunch, the same conversation: "where do you want to go?" — "I don\'t know, where do you want to go?" It\'s a surprisingly hard decision because it\'s low-stakes enough that nobody commits, but frequent enough that it drains energy.\n\nI wanted to automate the decision. But not with pure randomness — random is boring and ignores everything you already know about the options. I wanted something smarter: a wheel that learns from your history and naturally promotes the best options without feeling rigged.`,
+      },
+      {
+        heading: 'The weight algorithm',
+        body: `Each place gets a computed weight that determines how large its segment is on the wheel — and therefore its selection probability:\n\n\`\`\`\nweight = ratingFactor × costFactor × agingFactor\n\`\`\`\n\n**ratingFactor** = \`averageRating / 5\` — higher-rated places get more wheel space.\n**costFactor** = \`1 / (1 + averageCost / 1000)\` — cheaper options are gently favored.\n**agingFactor** = \`1 + (weeksSinceLastVisit × 0.2)\` — this is the interesting one. Every week a place goes unvisited, its weight grows by 20%. A place you haven\'t visited in a month gets roughly 2.5× its base weight.\n\nNew places with no history start at a neutral weight of 1.0 until data accumulates. The last selected place is always excluded from the next spin — no immediate repeats.`,
+      },
+      {
+        heading: 'The "✨ New" segment',
+        body: `One design challenge: how do you surface new places when established favorites dominate the wheel? A new place starts at weight 1.0 which might be tiny compared to a well-loved spot with a high rating.\n\nThe solution is a dedicated "✨ New" segment whose weight equals the **average** of all eligible places. When the arrow lands on it, the wheel pauses briefly and a second automatic spin runs — but this time only among places that have never been visited. It gives new places their own fair chance without distorting the main wheel's probabilities.`,
+      },
+      {
+        heading: 'SVG wheel and graph coloring',
+        body: `The wheel is drawn entirely in SVG. Each segment is an arc path computed from polar coordinates, with its size proportional to its weight relative to the total. This means the geometry reflects the actual probabilities — you can visually see which places dominate.\n\nColor assignment was interesting. The naive approach (sequential palette) often assigns similar colors to adjacent segments, which looks bad. Instead I use a **graph coloring algorithm on a cycle**: since the wheel is a cycle graph where every node is adjacent to exactly two others, it\'s always 2-colorable (or 3-colorable for odd cycles). The algorithm assigns colors greedily from a small palette, ensuring no two neighboring segments share the same color regardless of how many places are in the rotation.`,
+      },
+      {
+        heading: 'State management with Angular Signals',
+        body: `This was my first real project using Angular Signals end-to-end, and they fit the problem well. The places list, the active tag filter, the spin state machine, and the computed wheel segments are all modeled as \`signal()\` and \`computed()\` values.\n\nThe spin animation itself is a state machine with four states: **idle → spinning → result → idle**. The "✨ New" flow adds a fifth: **new-pending** between the first and second spin. Angular\'s \`ChangeDetectionStrategy.OnPush\` means the DOM only updates when signals change — which keeps animation frames smooth even as the wheel dynamics recalculate.`,
+      },
+      {
+        heading: 'Persistence: json-server and the EBUSY trap',
+        body: `For a side project with no auth and a single user, \`json-server\` is a perfect fit: zero setup, full REST API, and atomic writes to a JSON file. The data model is intentionally flat — one \`places\` collection with visits embedded as an array inside each place, plus a \`settings\` singleton for global state like \`lastSelectedId\`.\n\nDeploying it revealed a sharp edge: \`json-server\` uses \`steno\` under the hood, which writes atomically via a **temp-file rename**. On Linux, if you bind-mount a single file into a Docker container, the kernel locks the inode and \`rename()\` fails with \`EBUSY\`. The fix is to mount the **parent directory** instead of the file, and pass the full path to json-server explicitly:\n\n\`\`\`yaml\nvolumes:\n  - /srv/almorz:/srv/almorz\ncommand: npx json-server /srv/almorz/db.json --port 3001 --host 0.0.0.0\n\`\`\`\n\nThis is one of those bugs that only surfaces in production and takes two minutes to fix once you understand the cause.`,
+      },
+    ],
+  },
 ];
 
 // ── Skills — used in the terminal `skills` command and PresentationPanel pills ─
