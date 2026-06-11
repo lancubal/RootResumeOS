@@ -1,40 +1,34 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+// RootResumeOS — Interactive Cloud Terminal Portfolio
+
+import type { Metadata } from 'next';
+import { Geist, Geist_Mono } from 'next/font/google';
+import './globals.css';
 
 const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-    title: "Luna Lancuba — Portfolio",
-    description:
-        "Full Stack Developer. Explore my work in a real Linux terminal inside your browser.",
-    openGraph: {
-        title: "Luna Lancuba — Portfolio",
-        description:
-            "Full Stack Developer. Explore my work in a real Linux terminal inside your browser.",
-        type: "website",
-    },
+  title: 'Terminal de Agustín Lancuba',
+  description: 'Interactive cloud shell portfolio with remote code execution',
 };
 
 export default function RootLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
-    return (
-        <html lang="en">
-            <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-                {children}
-            </body>
-        </html>
-    );
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        {children}
+      </body>
+    </html>
+  );
 }
