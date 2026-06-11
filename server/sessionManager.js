@@ -88,6 +88,15 @@ class SessionManager {
     }
 
     /**
+     * Checks if a command is attempting to use sudo.
+     * Returns true if the command starts with 'sudo', false otherwise.
+     */
+    isSudoCommand(code) {
+        const trimmedCode = code.trim();
+        return trimmedCode.startsWith("sudo ");
+    }
+
+    /**
      * Executes a command inside the user's container.
      */
     async executeCommand(sessionId, code) {
@@ -95,6 +104,14 @@ class SessionManager {
         if (!session) throw new Error("Session expired or invalid.");
 
         session.lastActivity = Date.now();
+
+        // Check for sudo command and block it
+        if (this.isSudoCommand(code)) {
+            return {
+                output: "",
+                error: "Permiso denegado. Este incidente será reportado.",
+            };
+        }
 
         if (code.trim().startsWith("cd ")) {
             const targetDir = code.trim().substring(3).trim();
@@ -121,140 +138,158 @@ class SessionManager {
         return new Promise((resolve, reject) => {
             exec(execCommand, { timeout: 5000 }, (error, stdout, stderr) => {
                 if (error) {
-                    if (error.killed)
-                        return resolve({
-                            output: stdout,
+                    // Timeout or other exec error
+                    if (error.killed) {
+                        resolve({
+                            output: "",
                             error: "Timeout: 5s limit reached.",
                         });
-                    return resolve({
-                        output: stdout,
-                        error: stderr || error.message,
-                    });
+                    } else {
+                        resolve({
+                            output: "",
+                            error: stderr || error.message,
+                        });
+                    }
+                } else {
+                    resolve({ output: stdout, error: stderr || "" });
                 }
-                resolve({ output: stdout, error: stderr });
             });
         });
     }
 
     /**
-     * Spawns a command and returns the process for streaming.
+     * Provides autocomplete suggestions for a partial command.
      */
-    spawnCommand(sessionId, code) {
+    async getCompletions(sessionId, partial) {
         const session = this.sessions.get(sessionId);
         if (!session) throw new Error("Session expired or invalid.");
 
+        const commands = [
+            "about",
+            "ls",
+            "pwd",
+            "cd",
+            "cat",
+            "echo",
+            "whoami",
+            "help",
+            "clear",
+            "skills",
+            "fortune",
+            "matrix",
+            "konami",
+            "challenge",
+            "visualize",
+            "python3",
+            "gcc",
+            "top",
+            "?",
+        ];
+
+        return commands.filter((cmd) =>
+            cmd.toLowerCase().startsWith(partial.toLowerCase()),
+        );
+    }
+
+    /**
+     * Executes a command in the background (without waiting for completion).
+     */
+    executeInBackground(sessionId, code) {
+        const session = this.sessions.get(sessionId);
+        if (!session) {
+            console.error(`[${sessionId}] Session not found for background exec`);
+            return;
+        }
+
         session.lastActivity = Date.now();
 
-        // Construct the sh -c command string prepending CWD
-        const shellCommand = `cd ${session.cwd} && ${code}`;
+        const safeCode = code.replace(/"/g, '\\"');
+        const execCommand = `docker exec ${session.name} sh -c "cd ${session.cwd} && ${safeCode}"`;
 
-        console.log(
-            `[${sessionId}] Spawning stream in ${session.cwd}: ${code}`,
-        );
+        exec(execCommand, (error, stdout, stderr) => {
+            if (error && !error.killed) {
+                console.error(`[${sessionId}] Background error:`, stderr);
+            }
+        });
+    }
 
-        // Use spawn to allow real-time piping of stdout
+    /**
+     * Spawns a process for streaming (used for visualizations and real-time output).
+     */
+    spawnCommand(sessionId, executable) {
+        const session = this.sessions.get(sessionId);
+        if (!session) {
+            throw new Error("Session expired or invalid.");
+        }
+
+        session.lastActivity = Date.now();
+
         const child = spawn("docker", [
             "exec",
             session.name,
             "sh",
             "-c",
-            shellCommand,
+            `cd ${session.cwd} && ${executable}`,
         ]);
+
         return child;
     }
 
     /**
-     * Executes a command in the background (fire-and-forget).
+     * Gracefully terminates a session and its container.
      */
-    executeInBackground(sessionId, code) {
-        const session = this.sessions.get(sessionId);
-        if (!session) return; // Do nothing if session is invalid
-
-        session.lastActivity = Date.now();
-        const shellCommand = `cd ${session.cwd} && ${code}`;
-
-        console.log(`[${sessionId}] Spawning background process: ${code}`);
-
-        const child = spawn(
-            "docker",
-            ["exec", session.name, "sh", "-c", shellCommand],
-            {
-                detached: true,
-                stdio: "ignore",
-            },
-        );
-
-        child.unref(); // Allow the parent (our server) to exit independently
-    }
-
-    /**
-     * Gets file/directory completions for a partial path.
-     */
-    async getCompletions(sessionId, partial) {
-        const session = this.sessions.get(sessionId);
-        if (!session) return [];
-
-        // `ls -d` is crucial to list directory names instead of their contents
-        // `2>/dev/null` suppresses errors like "No such file or directory"
-        const listCommand = `ls -d -- ${partial}* 2>/dev/null`;
-        const execCommand = `docker exec ${session.name} sh -c "cd ${session.cwd} && ${listCommand}"`;
-
-        return new Promise((resolve) => {
-            exec(execCommand, (error, stdout, stderr) => {
-                if (error || stderr) {
-                    return resolve([]);
-                }
-                const completions = stdout
-                    .split("\n")
-                    .filter(Boolean)
-                    .map((line) => line.trim());
-                resolve(completions);
-            });
-        });
-    }
-
-    /**
-     * The Janitor: Enforces both Inactivity and Absolute Lifetime limits.
-     */
-    runGarbageCollector() {
-        const now = Date.now();
-        let collectedCount = 0;
-
-        this.sessions.forEach((data, sessionId) => {
-            const isInactive =
-                now - data.lastActivity > this.INACTIVITY_LIMIT_MS;
-            const isTooOld = now - data.createdAt > this.MAX_LIFETIME_MS;
-
-            if (isInactive || isTooOld) {
-                const reason = isTooOld ? "Life limit" : "Inactivity";
-                console.log(`[GC] Evicting ${sessionId} (${reason})`);
-                this.terminateSession(sessionId);
-                collectedCount++;
-            }
-        });
-
-        if (collectedCount > 0) {
-            console.log(`[GC] Cleaned up ${collectedCount} sessions.`);
-        }
-    }
-
     terminateSession(sessionId) {
         const session = this.sessions.get(sessionId);
-        if (!session) return;
+        if (!session) {
+            console.warn(`[${sessionId}] Already terminated or not found.`);
+            return;
+        }
 
-        console.log(`[${sessionId}] Terminating session (Container: ${session.name})...
-`);
-
-        // We just need to stop it. The --rm flag on creation handles the removal.
-        exec(`docker stop ${session.name}`, (error) => {
-            if (error)
+        const stopCommand = `docker stop ${session.name}`;
+        exec(stopCommand, (error) => {
+            if (error) {
                 console.error(
                     `[${sessionId}] Error stopping container:`,
                     error.message,
                 );
+            } else {
+                console.log(`[${sessionId}] Container stopped.`);
+            }
         });
 
         this.sessions.delete(sessionId);
+        console.log(`[${sessionId}] Removed from sessions map.`);
+    }
+
+    /**
+     * Garbage collector: checks for expired or inactive sessions.
+     */
+    runGarbageCollector() {
+        const now = Date.now();
+        const sessionsToDelete = [];
+
+        this.sessions.forEach((session, sessionId) => {
+            const inactivityAge = now - session.lastActivity;
+            const absoluteAge = now - session.createdAt;
+
+            if (
+                inactivityAge > this.INACTIVITY_LIMIT_MS ||
+                absoluteAge > this.MAX_LIFETIME_MS
+            ) {
+                sessionsToDelete.push(sessionId);
+            }
+        });
+
+        sessionsToDelete.forEach((sessionId) => {
+            console.log(
+                `[GC] Evicting expired session: ${sessionId} (${this.sessions.size} total before)`,
+            );
+            this.terminateSession(sessionId);
+        });
+
+        if (sessionsToDelete.length > 0) {
+            console.log(`[GC] Evicted ${sessionsToDelete.length} sessions.`);
+        }
     }
 }
 
