@@ -105,6 +105,7 @@ export default function RootResumeTerminal({
         "skills",
         "matrix",
         "fortune",
+        "oraculo",
         "konami",
         "challenge",
         "start",
@@ -557,6 +558,7 @@ export default function RootResumeTerminal({
                 "  ls projects    - View my projects",
                 "  skills         - Proficiency bar chart",
                 "  fortune        - Random dev quote",
+                "  oraculo        - Classic sci-fi quotes",
                 "  cat about-me.md- My bio",
                 "  visualize <id> - Run algo demo:",
                 "    C:      bubble, selection, quick, pathfinder, dfs",
@@ -607,6 +609,19 @@ export default function RootResumeTerminal({
             pushToHistory("|" + " ".repeat(W + 2) + "|");
             pushToHistory("| " + ("— " + q.author).padEnd(W) + " |");
             pushToHistory(bar);
+            pushToHistory("");
+            setIsLoading(false);
+            setTimeout(() => inputRef.current?.focus(), 10);
+        } else if (command === "oraculo") {
+            const quotes = [
+                "\"I must not fear. Fear is the mind-killer. Fear is the little-death that brings total obliteration.\" — Frank Herbert, Dune",
+                "\"Violence is the last refuge of the incompetent.\" — Isaac Asimov, Foundation",
+                "\"The sky above the port was the color of television, tuned to a dead channel.\" — William Gibson, Neuromancer",
+                "\"We are all of us, each and every one, a universe of one.\" — Dan Simmons, Hyperion"
+            ];
+            const selected = quotes[Math.floor(Math.random() * quotes.length)];
+            pushToHistory("");
+            pushToHistory(selected, "viz");
             pushToHistory("");
             setIsLoading(false);
             setTimeout(() => inputRef.current?.focus(), 10);
