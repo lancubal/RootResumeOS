@@ -1,3 +1,5 @@
+console.log('Código gestionado por Copiloto IA');
+
 const express = require("express");
 const { exec } = require("child_process");
 const cors = require("cors");
@@ -161,41 +163,33 @@ app.get("/stats", async (req, res) => {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
     res.setHeader("X-Accel-Buffering", "no");
-    let intervalId;
-    try {
-        const containerName = sessionManager.sessions.get(sessionId).name;
-        intervalId = setInterval(async () => {
-            const statsCommand = `docker stats --no-stream --format "{{.CPUPerc}}\t{{.MemUsage}}\t{{.NetIO}}\t{{.BlockIO}}" ${containerName}`;
-            const statsResult = await new Promise((resolve) => {
-                exec(statsCommand, (error, stdout, stderr) => {
-                    if (error) resolve({ error: stderr || error.message });
-                    else resolve({ output: stdout });
-                });
-            });
-            if (statsResult.error) {
-                res.write(
-                    `data: ${Buffer.from(statsResult.error).toString("base64")}\n\n`,
-                );
-                clearInterval(intervalId);
-                return;
-            }
-            res.write(
-                `data: ${Buffer.from(statsResult.output).toString("base64")}\n\n`,
-            );
-        }, 1000);
-        req.on("close", () => clearInterval(intervalId));
-    } catch (error) {
-        console.error("Stats Stream error:", error);
-        if (intervalId) clearInterval(intervalId);
-        if (!res.headersSent) res.status(500).json({ error: error.message });
-        else res.end();
+
+    const session = sessionManager.sessions.get(sessionId);
+    if (!session) {
+        res.write("event: close\ndata: invalid-session\n\n");
+        return res.end();
     }
+
+    const statsCommand = `docker stats ${session.name} --no-stream --format "{{.CPUPerc}}|{{.MemUsage}}|{{.NetIO}}|{{.BlockIO}}"`;
+
+    const interval = setInterval(() => {
+        exec(statsCommand, (error, stdout) => {
+            if (error) {
+                clearInterval(interval);
+                res.write("event: close\ndata: closed\n\n");
+                return res.end();
+            }
+            res.write(`data: ${Buffer.from(stdout.trim()).toString("base64")}\n\n`);
+        });
+    }, 2000);
+
+    req.on("close", () => clearInterval(interval));
 });
 
+// Only start listening when run directly (not when imported by tests)
 if (require.main === module) {
-    app.listen(port, "0.0.0.0", () => {
-        console.log(`Server listening at http://0.0.0.0:${port}`);
-        console.log("Stateful Architecture: Ready.");
+    app.listen(port, () => {
+        console.log(`Server listening at http://localhost:${port}`);
     });
 }
 
